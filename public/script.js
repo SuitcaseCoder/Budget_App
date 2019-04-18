@@ -2,13 +2,18 @@ const data = {
   events: [
     {
       name: 'Marathon Weekend',
-      date:123,
+      date:'September 14, 2019',
       budget: 1000
     },
     {
       name: 'Surprise Party',
-      date:123,
+      date:'May 28, 2019',
       budget: 1000
+    },
+    {
+      name: 'Bachelorette Weekend',
+      date: 'August 23, 2019',
+      budget: 500
     }
   ],
   users: [
@@ -42,9 +47,11 @@ const data = {
       value: 50
     }
   ]
-}
+};
 
-// events page
+let selectedEvent = '';
+
+// SCREEN ONE - list of events
 
 function renderEvents() {
   const eventsHTML = generateEventsHTML();
@@ -58,38 +65,38 @@ function generateEventsHTML() {
 
   return `<section class='events'>
         <h3>Events</h3>
-        <ul>
+        <ul class="eventItemsList">
         ${eventItems}
         </ul>
       </section>`;
 }
 
 function generateEventItemHTML(event) {
-  return `<li>
+  return `<li class="eventItem" id="${event.name}">
       <p>${event.name}</p>
       <p>${event.date}</p>
       <p>${event.budget}</p>
     </li>`;
 }
 
-// SCREEN TWO ----
-// part I -- total budget section
-function generateTotalBudgetHTML(){
+// SCREEN TWO - TOP - total budget
+function generateTotalBudgetHTML(selectedEvent){
   return `<section class="totBud">
-    <h3>Total Budget</h3>
+      <h2>${selectedEvent}</h2>
+      <h3>Total Budget</h3>
 
-    <label for="totalBudget">Event Total Budget:</label>
+        <label for="totalBudget">Event Total Budget:</label>
 
-    <input type="number" id="totBudget" name="totalBudget"
-          min="10">
+        <input type="number" id="totBudget" name="totalBudget"
+              min="10">
 
-  </section>`;
+    </section>`;
 
 };
 
+// SCREEN TWO - BOTTOM - expenses
 
 function generateExpensesHTML(){
-  console.log('hello');
   const expenseItems = data.expenses.map(expense =>{
     return generateExpenseItems(expense);
   }).join('');
@@ -103,9 +110,9 @@ function generateExpensesHTML(){
 }
 
 function renderExpenseItems() {
-  $('main').append(generateTotalBudgetHTML);
   renderExpenseItems2();
   handleSliderChange();
+  handleTotBudChange()
 }
 
 function renderExpenseItems2() {
@@ -114,13 +121,11 @@ function renderExpenseItems2() {
 }
 
 function generateExpenseItems(expense) {
-  //would I also have to pass the calculateExpenseAmt fx here?
   return `<li class="subCatItem">
       <p>${expense.name}</p>
       ${generateSlider(expense.name)}
       <p id='${expense.name}-value'>${calculateExpenseAmt(expense.value)}</p>
     </li>`;
-  // return generateSlider();
 }
 
 function calculateExpenseAmt(value){
@@ -133,7 +138,6 @@ function calculateExpenseAmt(value){
   return expenseTypeAmt;
 }
 
-// not sure if this should stand on its own?
 function generateSlider(name){
   return `<div id=${name} class="slidecontainer">
       <input type="range" name="slider" min="0" max="100" value="50" class="slider" id="myRange">
@@ -158,22 +162,68 @@ function handleSliderChange(){
   })
 }
 
+// IN BETWEEN SCREENS - hide first screen
+
+function listenEventSelected(){
+  $('.eventItemsList').on('click', 'li', function(e){
+    let eventSelected = $(this).attr('id');
+
+    selectedEvent = eventSelected;
+    replaceHTML(selectedEvent);
+  });
+}
+
+function replaceHTML(selectedEvent){
+  let budgetPageHTML = generateTotalBudgetHTML(selectedEvent);
+  $('main').html(budgetPageHTML);
+  renderExpenseItems();
+}
+
+function handleTotBudChange(){
+  $('input[type="number"]').on('change', function(e){
+    console.log(selectedEvent);
+
+    const val = $(this).val();
+    console.log(val);
+
+    data.events = data.events.map(el => {
+      if (el.name == selectedEvent){
+        el.budget = val;
+        console.log(el.budget);
+      }
+      console.log(el);
+      return el;
+    });
+    // calculateExpenseAmt ???
+  })
+}
 
 
 
-// budget page
-// function generateBudgetPage(){
-//   const eventTitle = data.events.map.name(event => {
-//     console.log(eventTitle);
-//   }).join('');
-//   return `
-//     <section class="eventBudget">
-//     <h3>${eventTitle}</h3>
-//     <
-//   `
+
+
+// function hideEventsPage(){
+//   $('.eventItemsList').on('click', 'li', function(e){
+//     alert(this.id);
+//     let eventSelected = this.id;
+//     console.log(eventSelected);
+//     $('.events').hide();
+//     generateTotalBudgetHTML();
+//   });
 // }
 
+// SHOW SLIDER RANGE NUMBER
 
-//
+// function displayCurrentRangeNum(){
+// }
+
+// UPDATES EXPENSE BUDGET PER EVENT
+
+
+
+
+
 $(renderEvents());
-$(renderExpenseItems());
+$(listenEventSelected());
+// $(renderExpenseItems());
+// $(hideEventsPage());
