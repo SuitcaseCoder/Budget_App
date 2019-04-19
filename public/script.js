@@ -3,17 +3,59 @@ const data = {
     {
       name: 'Marathon Weekend',
       date:'September 14, 2019',
-      budget: 1000
+      budget: 1000,
+      expenses: {
+        'food': {
+          name: 'foood',
+          percentage: .5
+        },
+        'transportation': {
+          name: 'transportation',
+          percentage: .5
+        },
+        'accomodation':{
+          name: 'accomodation',
+          percentage: .5
+        }
+      }
     },
     {
       name: 'Surprise Party',
       date:'May 28, 2019',
-      budget: 1000
+      budget: 1000,
+      expenses: {
+        'food': {
+          name: 'foood',
+          percentage: .5
+        },
+        'transportation': {
+          name: 'transportation',
+          percentage: .5
+        },
+        'accomodation':{
+          name: 'accomodation',
+          percentage: .5
+        }
+      }
     },
     {
       name: 'Bachelorette Weekend',
       date: 'August 23, 2019',
-      budget: 500
+      budget: 500,
+      expenses: {
+        'food': {
+          name: 'foood',
+          percentage: .5
+        },
+        'transportation': {
+          name: 'transportation',
+          percentage: .5
+        },
+        'accomodation':{
+          name: 'accomodation',
+          percentage: .5
+        }
+      }
     }
   ],
   users: [
@@ -33,20 +75,6 @@ const data = {
       username: 'shi_Shi'
     }
   ],
-  expenses: [
-    {
-      name: 'food',
-      value: 50
-    },
-    {
-      name: 'transportation',
-      value: 50
-    },
-    {
-      name: 'accomodation',
-      value: 50
-    }
-  ]
 };
 
 let selectedEvent = '';
@@ -191,7 +219,8 @@ function handleTotBudChange(){
         el.budget = val;
         console.log(el.budget);
       }
-      console.log(el);
+      let currentBud = el.budget;
+    console.log(el)
       return el;
     });
     // calculateExpenseAmt ???
