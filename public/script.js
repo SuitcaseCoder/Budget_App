@@ -107,90 +107,7 @@ function generateEventItemHTML(event) {
     </li>`;
 }
 
-// SCREEN TWO - TOP - total budget
-function generateTotalBudgetHTML(selectedEvent){
-  return `<section class="totBud">
-      <h2>${selectedEvent}</h2>
-      <h3>Total Budget</h3>
-
-        <label for="totalBudget">Event Total Budget:</label>
-
-        <input type="number" id="totBudget" name="totalBudget"
-              min="10">
-
-    </section>`;
-
-};
-
-// SCREEN TWO - BOTTOM - expenses
-
-function generateExpensesHTML(){
-  const expenseItems = data.expenses.map(expense =>{
-    return generateExpenseItems(expense);
-  }).join('');
-
-  return `<section class='expenses'>
-    <h3>Expenses</h3>
-    <ul>
-      ${expenseItems}
-    </ul>
-  </section>`;
-}
-
-function renderExpenseItems() {
-  renderExpenseItems2();
-  handleSliderChange();
-  handleTotBudChange()
-}
-
-function renderExpenseItems2() {
-  const expenseItemsHTML = generateExpensesHTML();
-  $('main').append(expenseItemsHTML);
-}
-
-function generateExpenseItems(expense) {
-  return `<li class="subCatItem">
-      <p>${expense.name}</p>
-      ${generateSlider(expense.name)}
-      <p id='${expense.name}-value'>${calculateExpenseAmt(expense.value)}</p>
-    </li>`;
-}
-
-function calculateExpenseAmt(value){
-  let expenseBudget = 1000;
-  console.log(expenseBudget);
-
-  let expenseTypeAmt = expenseBudget*(value/100);
-  console.log(expenseTypeAmt);
-
-  return expenseTypeAmt;
-}
-
-function generateSlider(name){
-  return `<div id=${name} class="slidecontainer">
-      <input type="range" name="slider" min="0" max="100" value="50" class="slider" id="myRange">
-      <label for="slider">percent of budget<label>
-    </div>`;
-
-}
-
-function handleSliderChange(){
-  $('input[type="range"]').on('change', function(e) {
-    const name = $(this).closest('div').attr('id');
-    const val = $(this).val();
-    console.log(name, val);
-    data.expenses = data.expenses.map(el => {
-      if (el.name === name) {
-        el.value = val;
-      }
-      return el;
-    });
-    // a function which only re-renders the values under the slider
-    $(`#${name}-value`).text(calculateExpenseAmt(val));
-  })
-}
-
-// IN BETWEEN SCREENS - hide first screen
+//CHANGE SCREENS
 
 function listenEventSelected(){
   $('.eventItemsList').on('click', 'li', function(e){
@@ -203,56 +120,108 @@ function listenEventSelected(){
 
 function replaceHTML(selectedEvent){
   let budgetPageHTML = generateTotalBudgetHTML(selectedEvent);
-  $('main').html(budgetPageHTML);
+  $('main').html(`
+    <section id="budgetPageSection"></section>`);
+  $('#budgetPageSection').append(budgetPageHTML);
   renderExpenseItems();
+}
+
+function generateTotalBudgetHTML(selectedEvent){
+  return `
+    <section class="totBud">
+      <h2>${selectedEvent}</h2>
+      <h3>Total Budget</h3>
+        <label for="totalBudget">Event Total Budget:</label>
+        <input type="number" id="totBudget" name="totalBudget"
+              min="10">
+    </section>`;
+
+};
+
+function renderExpenseItems() {
+  renderExpenseItems2();
+  handleSliderChange();
+  handleTotBudChange()
+}
+
+function handleSliderChange(){
+  $('input[type="range"]').on('change', function(e) {
+    const name = $(this).closest('div').attr('id');
+    const val = $(this).val();
+    console.log(JSON.stringify(data.events));
+
+    data.events.find(event => event.name === selectedEvent).expenses[name].percentage = val/100;
+
+    console.log(JSON.stringify(data.events));
+
+    // a function which only re-renders the values under the slider
+    $(`#${name}-value`).text(calculateExpenseAmt(val/100));
+  })
+}
+
+function calculateExpenseAmt(percentage){
+  let expenseBudget = data.events.find(event => event.name === selectedEvent).budget;
+  console.log(expenseBudget);
+
+  let expenseTypeAmt = expenseBudget*percentage;
+  return Math.floor(expenseTypeAmt);
+}
+
+function renderExpenseItems2() {
+  const expenseItemsHTML = generateExpensesHTML();
+  $('#budgetPageSection').append(expenseItemsHTML);
+}
+
+
+function generateExpensesHTML(){
+//modify to consider specific event and loop over those expenses
+  const expenseItems = data.events.find(event => event.name === selectedEvent).expenses;
+
+  const expenseItemsHTML = Object.values(expenseItems).map(expense => {
+    return generateExpenseItems(expense);
+  }).join('');
+
+  console.log(expenseItemsHTML)
+
+  return `<section class='expenses'>
+    <h3>Expenses</h3>
+    <ul>
+      ${expenseItems}
+    </ul>
+  </section>`;
+}
+
+function generateExpenseItems(expense) {
+  return `<li class="subCatItem">
+      <p>${expense.name}</p>
+      ${generateSlider(expense.name)}
+      <p id='${expense.name}-value'>${calculateExpenseAmt(expense.percentage)}</p>
+    </li>`;
+}
+
+function generateSlider(name){
+  let percentVal = data.events.find(event => event.name === selectedEvent).expenses[name].percentage;
+
+  return `<div id=${name} class="slidecontainer">
+      <input type="range" name="slider" min="0" max="100" value="${percentVal*100}" class="slider" id="myRange">
+      <label for="slider">percent of budget<label>
+    </div>`;
 }
 
 function handleTotBudChange(){
   $('input[type="number"]').on('change', function(e){
-    console.log(selectedEvent);
+    console.log(triggered);
 
     const val = $(this).val();
-    console.log(val);
-
     data.events = data.events.map(el => {
       if (el.name == selectedEvent){
         el.budget = val;
-        console.log(el.budget);
       }
-      let currentBud = el.budget;
-    console.log(el)
       return el;
     });
-    // calculateExpenseAmt ???
+      renderExpenseItems2();
   })
 }
 
-
-
-
-
-// function hideEventsPage(){
-//   $('.eventItemsList').on('click', 'li', function(e){
-//     alert(this.id);
-//     let eventSelected = this.id;
-//     console.log(eventSelected);
-//     $('.events').hide();
-//     generateTotalBudgetHTML();
-//   });
-// }
-
-// SHOW SLIDER RANGE NUMBER
-
-// function displayCurrentRangeNum(){
-// }
-
-// UPDATES EXPENSE BUDGET PER EVENT
-
-
-
-
-
 $(renderEvents());
 $(listenEventSelected());
-// $(renderExpenseItems());
-// $(hideEventsPage());
