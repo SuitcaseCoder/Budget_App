@@ -6,7 +6,7 @@ const data = {
       budget: 1000,
       expenses: {
         'food': {
-          name: 'foood',
+          name: 'food',
           percentage: .5
         },
         'transportation': {
@@ -25,7 +25,7 @@ const data = {
       budget: 1000,
       expenses: {
         'food': {
-          name: 'foood',
+          name: 'food',
           percentage: .5
         },
         'transportation': {
@@ -39,12 +39,31 @@ const data = {
       }
     },
     {
-      name: 'Bachelorette Weekend',
+      name: 'Camping Trip',
       date: 'August 23, 2019',
-      budget: 500,
+      budget: 1000,
       expenses: {
         'food': {
-          name: 'foood',
+          name: 'food',
+          percentage: .5
+        },
+        'transportation': {
+          name: 'transportation',
+          percentage: .5
+        },
+        'accomodation':{
+          name: 'accomodation',
+          percentage: .5
+        }
+      }
+    },
+    {
+      name: 'Photography Workshop',
+      date: 'October 22, 2019',
+      budget: 1000,
+      expenses: {
+        'food': {
+          name: 'food',
           percentage: .5
         },
         'transportation': {
@@ -145,7 +164,7 @@ function renderExpenseItems() {
 }
 
 function handleSliderChange(){
-  $('input[type="range"]').on('change', function(e) {
+  $('body').on('change','input[type="range"]', function(e) {
     const name = $(this).closest('div').attr('id');
     const val = $(this).val();
     console.log(JSON.stringify(data.events));
@@ -165,10 +184,13 @@ function calculateExpenseAmt(percentage){
 
   let expenseTypeAmt = expenseBudget*percentage;
   return Math.floor(expenseTypeAmt);
+
+  // all expenses within an event cannot exceed total budget for that event. change the slider's max amount based on the remaining amount to be spent
 }
 
 function renderExpenseItems2() {
   const expenseItemsHTML = generateExpensesHTML();
+  $('.expenses').html('');
   $('#budgetPageSection').append(expenseItemsHTML);
 }
 
@@ -181,12 +203,12 @@ function generateExpensesHTML(){
     return generateExpenseItems(expense);
   }).join('');
 
-  console.log(expenseItemsHTML)
+  // console.log(expenseItemsHTML)
 
   return `<section class='expenses'>
     <h3>Expenses</h3>
     <ul>
-      ${expenseItems}
+      ${expenseItemsHTML}
     </ul>
   </section>`;
 }
@@ -210,7 +232,6 @@ function generateSlider(name){
 
 function handleTotBudChange(){
   $('input[type="number"]').on('change', function(e){
-    console.log(triggered);
 
     const val = $(this).val();
     data.events = data.events.map(el => {
