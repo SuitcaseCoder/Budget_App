@@ -7,15 +7,15 @@ const data = {
       expenses: {
         'food': {
           name: 'food',
-          percentage: .5
+          percentage: 0
         },
         'transportation': {
           name: 'transportation',
-          percentage: .5
+          percentage: 0
         },
         'accomodation':{
           name: 'accomodation',
-          percentage: .5
+          percentage: 0
         }
       }
     },
@@ -26,15 +26,15 @@ const data = {
       expenses: {
         'food': {
           name: 'food',
-          percentage: .5
+          percentage: 0
         },
         'transportation': {
           name: 'transportation',
-          percentage: .5
+          percentage: 0
         },
         'accomodation':{
           name: 'accomodation',
-          percentage: .5
+          percentage: 0
         }
       }
     },
@@ -45,15 +45,15 @@ const data = {
       expenses: {
         'food': {
           name: 'food',
-          percentage: .5
+          percentage: 0
         },
         'transportation': {
           name: 'transportation',
-          percentage: .5
+          percentage: 0
         },
         'accomodation':{
           name: 'accomodation',
-          percentage: .5
+          percentage: 0
         }
       }
     },
@@ -64,15 +64,15 @@ const data = {
       expenses: {
         'food': {
           name: 'food',
-          percentage: .5
+          percentage: 0
         },
         'transportation': {
           name: 'transportation',
-          percentage: .5
+          percentage: 0
         },
         'accomodation':{
           name: 'accomodation',
-          percentage: .5
+          percentage: 0
         }
       }
     }
@@ -97,7 +97,7 @@ const data = {
 };
 
 let selectedEvent = '';
-
+// let thisArr = [];
 // SCREEN ONE - list of events
 
 function renderEvents() {
@@ -167,12 +167,23 @@ function handleSliderChange(){
   $('body').on('change','input[type="range"]', function(e) {
     const name = $(this).closest('div').attr('id');
     const val = $(this).val();
-    console.log(JSON.stringify(data.events));
-
+    $(this).siblings('label').text(val+ '% of budget')
+    // console.log(JSON.stringify(data.events));
     data.events.find(event => event.name === selectedEvent).expenses[name].percentage = val/100;
+    // console.log(JSON.stringify(data.events));
 
-    console.log(JSON.stringify(data.events));
-
+    let remainingPercentage = 100 - val;
+    $('input[type="range"]').each(function(){
+      if($(this).closest('div').attr('id')!==name){
+        if($(this).val()>=remainingPercentage){
+          $(this).val(remainingPercentage);
+          remainingPercentage = 0;
+        } else {
+          remainingPercentage -= $(this).val();
+        }
+        $(this).siblings('label').text($(this).val()+ '% of budget');
+      }
+    });
     // a function which only re-renders the values under the slider
     $(`#${name}-value`).text(calculateExpenseAmt(val/100));
   })
@@ -180,9 +191,9 @@ function handleSliderChange(){
 
 function calculateExpenseAmt(percentage){
   let expenseBudget = data.events.find(event => event.name === selectedEvent).budget;
-  console.log(expenseBudget);
-
+  // console.log(expenseBudget);
   let expenseTypeAmt = expenseBudget*percentage;
+  // updateThisArr(expenseTypeAmt);
   return Math.floor(expenseTypeAmt);
 
   // all expenses within an event cannot exceed total budget for that event. change the slider's max amount based on the remaining amount to be spent
@@ -203,8 +214,6 @@ function generateExpensesHTML(){
     return generateExpenseItems(expense);
   }).join('');
 
-  // console.log(expenseItemsHTML)
-
   return `<section class='expenses'>
     <h3>Expenses</h3>
     <ul>
@@ -217,7 +226,7 @@ function generateExpenseItems(expense) {
   return `<li class="subCatItem">
       <p>${expense.name}</p>
       ${generateSlider(expense.name)}
-      <p id='${expense.name}-value'>${calculateExpenseAmt(expense.percentage)}</p>
+      <p id='${expense.name}-value'>\$${calculateExpenseAmt(expense.percentage)}</p>
     </li>`;
 }
 
@@ -243,6 +252,8 @@ function handleTotBudChange(){
       renderExpenseItems2();
   })
 }
+
+
 
 $(renderEvents());
 $(listenEventSelected());
