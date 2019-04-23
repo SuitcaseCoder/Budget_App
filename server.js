@@ -1,6 +1,12 @@
 const express = require('express');
 const app = express();
 const port = 8080
+const mongoose = require('mongoose');
+
+const {PORT, DATABASE_URL} = require('./config');
+const {events} = require('./models');
+
+mongoose.Promise = global.Promise;
 
 app.use(express.static('public'));
 
@@ -19,11 +25,12 @@ function runServer() {
   });
 }
 
-// app.get('/', (req,res) => res.send({
-//   console.log('hey hey');
-//   message: 'hey hey app.get is i think working',
-//   color: 'pink'
-// }))
+//GET/PUT/POSTS GO ALL IN HERE
+//logic for api goes in server or router .js
+
+app.get('/events', (req,res) => res.send({
+
+}))
 //
 // app.get('/events', (req,res) => res.send({
 //   console.log('hello hello');
