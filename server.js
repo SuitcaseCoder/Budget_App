@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const port = 8080
 
 app.use(express.static('public'));
 
@@ -17,6 +18,16 @@ function runServer() {
     });
   });
 }
+
+// app.get('/', (req,res) => res.send({
+//   console.log('hey hey');
+//   message: 'hey hey app.get is i think working',
+//   color: 'pink'
+// }))
+//
+// app.get('/events', (req,res) => res.send({
+//   console.log('hello hello');
+// }))
 
 function closeServer() {
   return new Promise((resolve, reject) => {
