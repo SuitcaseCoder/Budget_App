@@ -28,9 +28,20 @@ function runServer() {
 //GET/PUT/POSTS GO ALL IN HERE
 //logic for api goes in server or router .js
 
-app.get('/events', (req,res) => res.send({
+app.get('/events', (req,res) => {
+  Event
+    .find()
+    .then(events => {
+      res.json(events)
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({message: 'internal server error'});
+    });
+});
 
-}))
+
+
 //
 // app.get('/events', (req,res) => res.send({
 //   console.log('hello hello');
@@ -51,7 +62,6 @@ function closeServer() {
 }
 
 if (require.main === module) {
-  runServer().catch(err => console.error(err));
-};
+  runServer(DATABASE_URL).catch(err => console.error(err));
 
 module.exports = {runServer, closeServer, app}
