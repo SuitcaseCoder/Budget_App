@@ -5,7 +5,7 @@
 
 const mongoose = require('mongoose');
 
-const eventSchema = mongooseSchema({
+const eventSchema = mongoose.Schema({
     title: {type: String, required: true},
     date: {type: Date, required: false,},
     budget: {type: Number, required: true},
@@ -13,9 +13,11 @@ const eventSchema = mongooseSchema({
     expenses: [{ type: mongoose.Schema.Types.ObjectId, ref:'Expense'}]
 });
 
-const expenseSchema = mongooseSchema({
+const expenseSchema = mongoose.Schema({
   title: {type: String, required: true},
   percentage: {type: Number}
-})
+});
 
-const events = mongoose.model('Event', eventSchema);
+const Event = mongoose.model('Event', eventSchema);
+
+module.exports = {Event};

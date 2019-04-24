@@ -20,6 +20,7 @@ function runServer() {
       resolve(server);
     })
     .on('error', err => {
+      mongoose.disconnect();
       reject(err);
     });
   });
@@ -32,15 +33,13 @@ app.get('/events', (req,res) => {
   Event
     .find()
     .then(events => {
-      res.json(events)
+      res.json(event)
     })
     .catch(err => {
       console.log(err);
       res.status(500).json({message: 'internal server error'});
     });
 });
-
-
 
 //
 // app.get('/events', (req,res) => res.send({
@@ -63,5 +62,6 @@ function closeServer() {
 
 if (require.main === module) {
   runServer(DATABASE_URL).catch(err => console.error(err));
+}
 
 module.exports = {runServer, closeServer, app}
