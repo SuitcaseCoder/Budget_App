@@ -4,42 +4,87 @@ const port = 8080
 const mongoose = require('mongoose');
 
 const {PORT, DATABASE_URL} = require('./config');
-const {events} = require('./models');
+const {Event} = require('./models');
+
+const bodyParser = require('body-parser');
+
+const jsonParser = bodyParser.json();
 
 mongoose.Promise = global.Promise;
 
 app.use(express.static('public'));
 
-let server;
-
-function runServer() {
-  const port = process.env.PORT || 8080;
-  return new Promise((resolve, reject) => {
-    server = app.listen(port, () => {
-      console.log(`Your app is listening on port ${port}`);
-      resolve(server);
-    })
-    .on('error', err => {
-      mongoose.disconnect();
-      reject(err);
-    });
-  });
-}
-
-//GET/PUT/POSTS GO ALL IN HERE
-//logic for api goes in server or router .js
 
 app.get('/events', (req,res) => {
   Event
     .find()
     .then(events => {
-      res.json(event)
+      res.json(events)
     })
     .catch(err => {
       console.log(err);
       res.status(500).json({message: 'internal server error'});
     });
 });
+
+app.post('/events', jsonParser, (req, res) => {
+  // ensure `name` and `budget` are in request body
+  const requiredFields = ['title', 'budget'];
+  for (let i=0; i<requiredFields.length; i++) {
+    const field = requiredFields[i];
+    if (!(field in req.body)) {
+      const message = `Missing \`${field}\` in request body`
+      console.error(message);
+      return res.status(400).send(message);
+    }
+  }
+
+  const item = Event.create(req.body.title, req.body.budget);
+  res.status(201).json(item);
+});
+
+let server;
+//
+// function runServer() {
+//   const port = process.env.PORT || 8080;
+//   return new Promise((resolve, reject) => {
+//     server = app.listen(port, () => {
+//       console.log(`Your app is listening on port ${port}`);
+//       resolve(server);
+//     })
+//     .on('error', err => {
+//       mongoose.disconnect();
+//       reject(err);
+//     });
+//   });
+// }
+
+
+function runServer(port, databaseUrl){
+  return new Promise( (resolve, reject) => {
+    mongoose.connect(databaseUrl,
+        err => {
+          if (err){
+            return reject(err);
+          }
+          else{
+            server = app.listen(port, () =>{
+              console.log('Your app is running in port ', port);
+              resolve();
+            })
+            .on('error', err => {
+              mongoose.disconnect();
+              return reject(err);
+            });
+          }
+        }
+      );
+  });
+}
+
+//GET/PUT/POSTS GO ALL IN HERE
+//logic for api goes in server or router .js
+
 
 //
 // app.get('/events', (req,res) => res.send({
@@ -61,7 +106,7 @@ function closeServer() {
 }
 
 if (require.main === module) {
-  runServer(DATABASE_URL).catch(err => console.error(err));
+  runServer(8080, DATABASE_URL).catch(err => console.error(err));
 }
 
 module.exports = {runServer, closeServer, app}
