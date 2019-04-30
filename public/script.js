@@ -129,19 +129,45 @@ function generateEventItemHTML(event) {
 // + buttons = post requests
 
 function handleAddEventButton(){
-  //opens form or input fields
+  //displays form or input fields
+  $('.addEventbutton').on('click', function(){
+    generateAddEventForm();
+  })
 }
 
 function generateAddEventForm(){
   //html for event form ONLY
+  $('main').append(`
+    <div class="eventFormDiv">
+      <form role="form" class="eventForm">
+        <div>
+          <label for="eventTitle">Name your event:</label>
+          <input type="text"  id="eventTitle">
+        </div>
+        <div>
+          <label for="eventDate">Date of your event:</label>
+          <input type="date"  id="eventDate">
+        </div>
+        <div>
+          <label for="eventBudget">Budget for your event: $</label>
+          <input type="number"  id="eventBudget">
+        </div>
+        <input class="submitEventButton" id="submitNewEvent" type="button" value="Submit Event" role="button">
+      </form>
+    </div> `)
 }
 
 function submitEventForm(){
   //triggers new event (from post request) to be created
+  $('#submitNewEvent').on('click',function(){
+
+  })
 }
 
 function newEventCreated(){
-  //displays new event on list of events
+  //displays new event on list of events on ul
+  $('.eventItemsList').append(`
+    `)
 }
 
 

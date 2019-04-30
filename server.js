@@ -29,7 +29,7 @@ app.get('/events', (req,res) => {
 
 app.post('/events', jsonParser, (req, res) => {
   // ensure `name` and `budget` are in request body
-  const requiredFields = ['title', 'budget'];
+  const requiredFields = ['title', 'date', 'budget'];
   for (let i=0; i<requiredFields.length; i++) {
     const field = requiredFields[i];
     if (!(field in req.body)) {
@@ -39,7 +39,7 @@ app.post('/events', jsonParser, (req, res) => {
     }
   }
 
-  const item = Event.create(req.body.title, req.body.budget);
+  const item = Event.create(req.body.title, req.body.date, req.body.budget);
   res.status(201).json(item);
 });
 
