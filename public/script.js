@@ -115,6 +115,7 @@ function generateEventsHTML() {
         <ul class="eventItemsList">
         ${eventItems}
         </ul>
+        <input class="addEventButton" type="button" value="+" role="button">Add Event</input>
       </section>`;
 }
 
@@ -122,9 +123,27 @@ function generateEventItemHTML(event) {
   return `<li class="eventItem" id="${event.name}">
       <p>${event.name}</p>
       <p>${event.date}</p>
-      <p>${event.budget}</p>
+      <p>Budget: $${event.budget}</p>
     </li>`;
 }
+// + buttons = post requests
+
+function handleAddEventButton(){
+  //opens form or input fields
+}
+
+function generateAddEventForm(){
+  //html for event form ONLY
+}
+
+function submitEventForm(){
+  //triggers new event (from post request) to be created
+}
+
+function newEventCreated(){
+  //displays new event on list of events
+}
+
 
 //CHANGE SCREENS
 
@@ -149,8 +168,8 @@ function generateTotalBudgetHTML(selectedEvent){
   return `
     <section class="totBud">
       <h2>${selectedEvent}</h2>
-      <h3>Total Budget</h3>
-        <label for="totalBudget">Event Total Budget:</label>
+      <h3>Visualize your budget for your upcoming ${selectedEvent}</h3>
+        <label for="totalBudget">What's your budget?:</label>
         <input type="number" id="totBudget" name="totalBudget"
               min="10">
     </section>`;
@@ -219,6 +238,7 @@ function generateExpensesHTML(){
     <ul>
       ${expenseItemsHTML}
     </ul>
+    <input class="addExpenseButton" type="button" value="+" role="button">Add Expense</input>
   </section>`;
 }
 

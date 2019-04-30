@@ -19,5 +19,8 @@ const expenseSchema = mongoose.Schema({
 });
 
 const Event = mongoose.model('Event', eventSchema);
+const Expense = mongoose.model('Expense', expenseSchema);
+
 
 module.exports = {Event};
+module.exports = {Expense}

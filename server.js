@@ -9,11 +9,11 @@ const {Event} = require('./models');
 const bodyParser = require('body-parser');
 
 const jsonParser = bodyParser.json();
-
 mongoose.Promise = global.Promise;
 
-app.use(express.static('public'));
 
+
+app.use(express.static('public'));
 
 app.get('/events', (req,res) => {
   Event
@@ -43,21 +43,38 @@ app.post('/events', jsonParser, (req, res) => {
   res.status(201).json(item);
 });
 
-let server;
+app.get('/expenses', (req,res) => {
+  Expense
+    .find()
+    .then(expenses => {
+      res.json(expenses)
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({message: 'internal server error'});
+    });
+});
+
+// app.post('/expensess', jsonParser, (req, res) => {
+//   // ensure `name` and `budget` are in request body
+//   const requiredFields = ['title', 'percentage'];
+//   for (let i=0; i<requiredFields.length; i++) {
+//     const field = requiredFields[i];
+//     if (!(field in req.body)) {
+//       const message = `Missing \`${field}\` in request body`
+//       console.error(message);
+//       return res.status(400).send(message);
+//     }
+//   }
 //
-// function runServer() {
-//   const port = process.env.PORT || 8080;
-//   return new Promise((resolve, reject) => {
-//     server = app.listen(port, () => {
-//       console.log(`Your app is listening on port ${port}`);
-//       resolve(server);
-//     })
-//     .on('error', err => {
-//       mongoose.disconnect();
-//       reject(err);
-//     });
-//   });
-// }
+//   const item = Expense.create(req.body.title, req.body.percentage);
+//   res.status(201).json(item);
+// });
+//
+// app.delete()
+//
+
+let server;
 
 
 function runServer(port, databaseUrl){
@@ -77,7 +94,8 @@ function runServer(port, databaseUrl){
               return reject(err);
             });
           }
-        }
+
+      }
       );
   });
 }
