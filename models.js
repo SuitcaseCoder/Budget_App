@@ -23,4 +23,4 @@ const Expense = mongoose.model('Expense', expenseSchema);
 
 
 module.exports = {Event};
-module.exports = {Expense}
+module.exports = {Expense};

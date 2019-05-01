@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 
 const {PORT, DATABASE_URL} = require('./config');
 const {Event} = require('./models');
+const {Expense} = require('./models');
 
 const bodyParser = require('body-parser');
 
@@ -27,6 +28,7 @@ app.get('/events', (req,res) => {
     });
 });
 
+
 app.post('/events', jsonParser, (req, res) => {
   // ensure `name` and `budget` are in request body
   const requiredFields = ['title', 'date', 'budget'];
@@ -39,8 +41,23 @@ app.post('/events', jsonParser, (req, res) => {
     }
   }
 
-  const item = Event.create(req.body.title, req.body.date, req.body.budget);
-  res.status(201).json(item);
+//this 
+  Event
+    .create({
+      title: req.body.title,
+      date: req.body.date,
+      budget: req.body.budget
+    })
+    .then(
+      event => res.status(201).json(restaurant.serialize())
+    )
+    .catch(err => {
+      console.err(err);
+      res.status(500).json({message: 'Internal server error'});
+    });
+//or this
+  // const item = Event.create(req.body.title, req.body.date, req.body.budget);
+  // res.status(201).json(item);
 });
 
 app.get('/expenses', (req,res) => {
@@ -55,24 +72,22 @@ app.get('/expenses', (req,res) => {
     });
 });
 
-// app.post('/expensess', jsonParser, (req, res) => {
-//   // ensure `name` and `budget` are in request body
-//   const requiredFields = ['title', 'percentage'];
-//   for (let i=0; i<requiredFields.length; i++) {
-//     const field = requiredFields[i];
-//     if (!(field in req.body)) {
-//       const message = `Missing \`${field}\` in request body`
-//       console.error(message);
-//       return res.status(400).send(message);
-//     }
-//   }
-//
-//   const item = Expense.create(req.body.title, req.body.percentage);
-//   res.status(201).json(item);
-// });
-//
-// app.delete()
-//
+app.post('/expenses', jsonParser, (req, res) => {
+  // ensure `name` and `budget` are in request body
+  const requiredFields = ['title', 'percentage'];
+  for (let i=0; i<requiredFields.length; i++) {
+    const field = requiredFields[i];
+    if (!(field in req.body)) {
+      const message = `Missing \`${field}\` in request body`
+      console.error(message);
+      return res.status(400).send(message);
+    }
+  }
+
+  const item = Expense.create(req.body.title, req.body.percentage);
+  res.status(201).json(item);
+});
+
 
 let server;
 
@@ -100,14 +115,6 @@ function runServer(port, databaseUrl){
   });
 }
 
-//GET/PUT/POSTS GO ALL IN HERE
-//logic for api goes in server or router .js
-
-
-//
-// app.get('/events', (req,res) => res.send({
-//   console.log('hello hello');
-// }))
 
 function closeServer() {
   return new Promise((resolve, reject) => {

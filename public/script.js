@@ -97,7 +97,6 @@ const data = {
 };
 
 let selectedEvent = '';
-// let thisArr = [];
 // SCREEN ONE - list of events
 
 function renderEvents() {
@@ -126,50 +125,6 @@ function generateEventItemHTML(event) {
       <p>Budget: $${event.budget}</p>
     </li>`;
 }
-// + buttons = post requests
-
-function handleAddEventButton(){
-  //displays form or input fields
-  $('.addEventbutton').on('click', function(){
-    generateAddEventForm();
-  })
-}
-
-function generateAddEventForm(){
-  //html for event form ONLY
-  $('main').append(`
-    <div class="eventFormDiv">
-      <form role="form" class="eventForm">
-        <div>
-          <label for="eventTitle">Name your event:</label>
-          <input type="text"  id="eventTitle">
-        </div>
-        <div>
-          <label for="eventDate">Date of your event:</label>
-          <input type="date"  id="eventDate">
-        </div>
-        <div>
-          <label for="eventBudget">Budget for your event: $</label>
-          <input type="number"  id="eventBudget">
-        </div>
-        <input class="submitEventButton" id="submitNewEvent" type="button" value="Submit Event" role="button">
-      </form>
-    </div> `)
-}
-
-function submitEventForm(){
-  //triggers new event (from post request) to be created
-  $('#submitNewEvent').on('click',function(){
-
-  })
-}
-
-function newEventCreated(){
-  //displays new event on list of events on ul
-  $('.eventItemsList').append(`
-    `)
-}
-
 
 //CHANGE SCREENS
 
@@ -236,12 +191,8 @@ function handleSliderChange(){
 
 function calculateExpenseAmt(percentage){
   let expenseBudget = data.events.find(event => event.name === selectedEvent).budget;
-  // console.log(expenseBudget);
   let expenseTypeAmt = expenseBudget*percentage;
-  // updateThisArr(expenseTypeAmt);
   return Math.floor(expenseTypeAmt);
-
-  // all expenses within an event cannot exceed total budget for that event. change the slider's max amount based on the remaining amount to be spent
 }
 
 function renderExpenseItems2() {
@@ -252,7 +203,6 @@ function renderExpenseItems2() {
 
 
 function generateExpensesHTML(){
-//modify to consider specific event and loop over those expenses
   const expenseItems = data.events.find(event => event.name === selectedEvent).expenses;
 
   const expenseItemsHTML = Object.values(expenseItems).map(expense => {
@@ -297,6 +247,89 @@ function handleTotBudChange(){
     });
       renderExpenseItems2();
   })
+}
+
+// + BUTTONS - POST REQUESTS (EVENTS)
+
+function handleAddEventButton(){
+  //displays form or input fields
+  $('.addEventbutton').on('click', function(){
+    generateAddEventForm();
+  })
+}
+
+function generateAddEventForm(){
+  //html for event form ONLY
+  $('main').append(`
+    <div class="eventFormDiv">
+      <form role="form" class="eventForm">
+        <div>
+          <label for="eventTitle">Name your event:</label>
+          <input type="text"  id="eventTitle">
+        </div>
+        <div>
+          <label for="eventDate">Date of your event:</label>
+          <input type="date"  id="eventDate">
+        </div>
+        <div>
+          <label for="eventBudget">Budget for your event: $</label>
+          <input type="number"  id="eventBudget">
+        </div>
+        <input class="submitEventButton" id="submitNewEvent" type="button" value="Submit Event" role="button">
+      </form>
+    </div> `)
+}
+
+function getNewEventInputVals(){
+    let newEventTitle = $('#eventTitle').val();
+    let newEventDate = $('#eventDate').val();
+    let newEventBudget = $('#eventBudget').val();
+
+    let postRequestData = {
+      title: $(newEventTitle);,
+      date: $(newEventDate);,
+      budget: $(newEventBudget);
+    };
+
+    getNewEventInputVals(postRequestData);
+}
+
+
+function submitEventForm(){
+  //sends those input vals to to that data variable
+  $('#submitNewEvent').on('click',function(){
+
+  })
+}
+
+function newEventCreated(){
+  //displays new event on list of events on ul
+  $('.eventItemsList').append(`
+    `)
+
+    //do I call this here? and pass it that response from the fetch?
+    generateEventItemHTML()
+}
+
+//
+// CALL TO API
+// how do I turn this into a POST
+function callAPI(postRequestData){
+//fetch to DATABASE_URL
+//define url somewhere
+  fetch('mongodb://localhost/budgetAppDB', {
+      method: 'POST',
+      body: JSON.stringify(postRequestData),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+//.then turn that response to json in case it's not
+  .then(response => response.json())
+//.then pass that new response into the function that will display what needs to be displayed (i think in this case it would be the html of the specific event OR the html that passesthat specific info into that event)
+  .then(newResponse => newEventCreated(newResponse))
+// catch any errors at this point
+  .catch(error => console.log(error))
 }
 
 
