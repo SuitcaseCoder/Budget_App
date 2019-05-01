@@ -253,7 +253,8 @@ function handleTotBudChange(){
 
 function handleAddEventButton(){
   //displays form or input fields
-  $('.addEventbutton').on('click', function(){
+
+  $('body').on('click', 'input[type="button"]', function(e){
     generateAddEventForm();
   })
 }
@@ -275,9 +276,18 @@ function generateAddEventForm(){
           <label for="eventBudget">Budget for your event: $</label>
           <input type="number"  id="eventBudget">
         </div>
-        <input class="submitEventButton" id="submitNewEvent" type="button" value="Submit Event" role="button">
+        <input class="submitEventButton" id="submitNewEvent" type="submit" value="Submit Event" role="button">
       </form>
     </div> `)
+
+    onNewEventSubmit();
+}
+
+function onNewEventSubmit(){
+  $('form').on('click', 'input[type="submit"]', function(e){
+    event.preventDefault(e);
+    getNewEventInputVals();
+  });
 }
 
 function getNewEventInputVals(){
@@ -286,30 +296,22 @@ function getNewEventInputVals(){
     let newEventBudget = $('#eventBudget').val();
 
     let postRequestData = {
-      title: $(newEventTitle);,
-      date: $(newEventDate);,
-      budget: $(newEventBudget);
+      title: newEventTitle,
+      date: newEventDate,
+      budget: newEventBudget
     };
 
-    getNewEventInputVals(postRequestData);
+    console.log(postRequestData);
+    callAPI(postRequestData);
 }
 
-
-function submitEventForm(){
-  //sends those input vals to to that data variable
-  $('#submitNewEvent').on('click',function(){
-
-  })
-}
-
-function newEventCreated(){
-  //displays new event on list of events on ul
-  $('.eventItemsList').append(`
-    `)
-
-    //do I call this here? and pass it that response from the fetch?
-    generateEventItemHTML()
-}
+// function newEventCreated(){
+//   //displays new event on list of events on ul
+//   $('.eventItemsList').append(`
+//     `)
+//     //do I call this here? and pass it that response from the fetch?
+//     generateEventItemHTML()
+// }
 
 //
 // CALL TO API
@@ -317,7 +319,7 @@ function newEventCreated(){
 function callAPI(postRequestData){
 //fetch to DATABASE_URL
 //define url somewhere
-  fetch('mongodb://localhost/budgetAppDB', {
+  fetch('http://localhost:8080/events', {
       method: 'POST',
       body: JSON.stringify(postRequestData),
       headers: {
@@ -334,5 +336,7 @@ function callAPI(postRequestData){
 
 
 
+
 $(renderEvents());
 $(listenEventSelected());
+$(handleAddEventButton());
