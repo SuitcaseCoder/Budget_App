@@ -8,9 +8,9 @@ const mongoose = require('mongoose');
 const eventSchema = mongoose.Schema({
     title: {type: String, required: true},
     date: {type: Date, required: true,},
-    budget: {type: Number, required: true}
+    budget: {type: Number, required: true},
     //expenses will be an array of objects
-    // expenses: [{ type: mongoose.Schema.Types.ObjectId, ref:'Expense'}]
+    expenses: [{ type: mongoose.Schema.Types.ObjectId, ref:'Expense'}]
 });
 
 const expenseSchema = mongoose.Schema({

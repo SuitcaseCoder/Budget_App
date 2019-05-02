@@ -99,16 +99,23 @@ const data = {
 let selectedEvent = '';
 // SCREEN ONE - list of events
 
-function renderEvents() {
-  const eventsHTML = generateEventsHTML();
-  $('main').html(eventsHTML);
+// function renderEvents() {
+//   fetchGET();
+//   const eventsHTML = generateEventsHTML(newResponse);
+//   $('main').html(eventsHTML);
+// }
+
+function appendToDOM(data){
+  const eventsHTML = generateEventsHTML(data);
+    $('main').html(eventsHTML);
 }
 
-function generateEventsHTML() {
-  const eventItems = data.events.map(event => {
+function generateEventsHTML(newResponse) {
+  // console.log(newResponse);
+  const eventItems = newResponse.map(event => {
     return generateEventItemHTML(event);
   }).join('');
-
+// console.log(eventItems);
   return `<section class='events'>
         <h3>Events</h3>
         <input class="addEventButton" type="button" value="+" role="button">Add Event</input>
@@ -118,21 +125,33 @@ function generateEventsHTML() {
       </section>`;
 }
 
-function generateEventItemHTML(newResponse) {
-  console.log('this is the data', newResponse);
-  return `<li class="eventItem" id="${event.name}">
-      <p>${event.name}</p>
-      <p>${event.date}</p>
-      <p>Budget: $${event.budget}</p>
+function generateEventItemHTML(eventsData) {
+  // console.log('this is the data', newResponse);
+  return `<li class="eventItem" id="${eventsData.title}">
+      <p>${eventsData.title}</p>
+      <p>${eventsData.date}</p>
+      <p>Budget: $${eventsData.budget}</p>
     </li>`;
 }
 
+//RENDER NEW EVENT ITEM AFTER POST TO API MADE
+function renderNewEventCreated(updatedEventsData){
+  console.log(updatedEventsData);
+
+  $('.eventItemsList').append(`
+    <li class="eventItem" id="${updatedEventsData.title}">
+        <p>${updatedEventsData.title}</p>
+        <p>${updatedEventsData .date}</p>
+        <p>Budget: $${updatedEventsData.budget}</p>
+      </li>
+    `)
+}
 //CHANGE SCREENS
 
 function listenEventSelected(){
   $('.eventItemsList').on('click', 'li', function(e){
     let eventSelected = $(this).attr('id');
-
+    
     selectedEvent = eventSelected;
     replaceHTML(selectedEvent);
   });
@@ -304,13 +323,20 @@ function getNewEventInputVals(){
     };
 
     console.log(postRequestData);
-    callAPI(postRequestData);
+    callAPIPOST(postRequestData);
 }
 
 
 // CALL TO API
+function fetchGET(){
+  fetch('http://localhost:8080/events')
+  .then(res => res.json())
+  .then(newResponse => appendToDOM(newResponse))
+  .catch(error => console.log(error))
+}
 
-function callAPI(postRequestData){
+
+function callAPIPOST(postRequestData){
   fetch('http://localhost:8080/events', {
       method: 'POST',
       body: JSON.stringify(postRequestData),
@@ -319,11 +345,15 @@ function callAPI(postRequestData){
       }
     })
   .then(response => response.json())
-  .then(newResponse => generateEventItemHTML(newResponse))
+  .then(newResponse =>
+    renderNewEventCreated(newResponse)
+    // generateEventItemHTML(newResponse)
+  )
   .catch(error => console.log(error))
 }
 
 
-$(renderEvents());
+
+$(fetchGET());
 $(listenEventSelected());
 $(handleAddEventButton());

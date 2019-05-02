@@ -19,12 +19,15 @@ app.use(express.static('public'));
 app.get('/events', (req,res) => {
   Event
     .find()
+    .populate('expenses')
+    .exec()
     .then(events => {
-      res.json(events)
+      console.log(events)
+      return res.json(events)
     })
     .catch(err => {
       console.log(err);
-      res.status(500).json({message: 'internal server error'});
+      return res.status(500).json({message: 'internal server error'});
     });
 });
 
