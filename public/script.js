@@ -111,10 +111,10 @@ function generateEventsHTML() {
 
   return `<section class='events'>
         <h3>Events</h3>
+        <input class="addEventButton" type="button" value="+" role="button">Add Event</input>
         <ul class="eventItemsList">
         ${eventItems}
         </ul>
-        <input class="addEventButton" type="button" value="+" role="button">Add Event</input>
       </section>`;
 }
 
@@ -211,10 +211,11 @@ function generateExpensesHTML(){
 
   return `<section class='expenses'>
     <h3>Expenses</h3>
+    <input class="addExpenseButton" type="button" value="+" role="button">Add Expense</input>
     <ul>
       ${expenseItemsHTML}
     </ul>
-    <input class="addExpenseButton" type="button" value="+" role="button">Add Expense</input>
+
   </section>`;
 }
 
@@ -305,20 +306,19 @@ function getNewEventInputVals(){
     callAPI(postRequestData);
 }
 
-// function newEventCreated(){
-//   //displays new event on list of events on ul
-//   $('.eventItemsList').append(`
-//     `)
-//     //do I call this here? and pass it that response from the fetch?
-//     generateEventItemHTML()
-// }
+function newEventCreated(){
+  console.log('made it to newEventCreated');
+  //displays new event on list of events on ul
+  // $('.eventItemsList').append(`
+  //   `)
+  //   //do I call this here? and pass it that response from the fetch?
+  //   generateEventItemHTML()
+}
 
-//
 // CALL TO API
-// how do I turn this into a POST
+
 function callAPI(postRequestData){
-//fetch to DATABASE_URL
-//define url somewhere
+
   fetch('http://localhost:8080/events', {
       method: 'POST',
       body: JSON.stringify(postRequestData),
@@ -326,15 +326,10 @@ function callAPI(postRequestData){
         'Content-Type': 'application/json'
       }
     })
-//.then turn that response to json in case it's not
   .then(response => response.json())
-//.then pass that new response into the function that will display what needs to be displayed (i think in this case it would be the html of the specific event OR the html that passesthat specific info into that event)
   .then(newResponse => newEventCreated(newResponse))
-// catch any errors at this point
   .catch(error => console.log(error))
 }
-
-
 
 
 $(renderEvents());

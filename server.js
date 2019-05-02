@@ -4,8 +4,8 @@ const port = 8080
 const mongoose = require('mongoose');
 
 const {PORT, DATABASE_URL} = require('./config');
-const {Event} = require('./models');
-const {Expense} = require('./models');
+const {Event, Expense} = require('./models');
+// const {Expense} = require('./models');
 
 const bodyParser = require('body-parser');
 
@@ -41,7 +41,7 @@ app.post('/events', jsonParser, (req, res) => {
     }
   }
 
-//this 
+//this
   Event
     .create({
       title: req.body.title,
@@ -49,13 +49,14 @@ app.post('/events', jsonParser, (req, res) => {
       budget: req.body.budget
     })
     .then(
-      event => res.status(201).json(restaurant.serialize())
+      event => res.status(201)
+      // .json(obj)
     )
     .catch(err => {
-      console.err(err);
+      console.log(err);
       res.status(500).json({message: 'Internal server error'});
     });
-//or this
+// or this
   // const item = Event.create(req.body.title, req.body.date, req.body.budget);
   // res.status(201).json(item);
 });
@@ -94,6 +95,7 @@ let server;
 
 function runServer(port, databaseUrl){
   return new Promise( (resolve, reject) => {
+    mongoose.set('debug', true);
     mongoose.connect(databaseUrl,
         err => {
           if (err){
