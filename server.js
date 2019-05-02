@@ -49,7 +49,7 @@ app.post('/events', jsonParser, (req, res) => {
       budget: req.body.budget
     })
     .then(
-      event => res.status(201)
+      event => res.status(201).json(event)
       // .json(obj)
     )
     .catch(err => {

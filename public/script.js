@@ -118,7 +118,8 @@ function generateEventsHTML() {
       </section>`;
 }
 
-function generateEventItemHTML(event) {
+function generateEventItemHTML(newResponse) {
+  console.log('this is the data', newResponse);
   return `<li class="eventItem" id="${event.name}">
       <p>${event.name}</p>
       <p>${event.date}</p>
@@ -306,19 +307,10 @@ function getNewEventInputVals(){
     callAPI(postRequestData);
 }
 
-function newEventCreated(){
-  console.log('made it to newEventCreated');
-  //displays new event on list of events on ul
-  // $('.eventItemsList').append(`
-  //   `)
-  //   //do I call this here? and pass it that response from the fetch?
-  //   generateEventItemHTML()
-}
 
 // CALL TO API
 
 function callAPI(postRequestData){
-
   fetch('http://localhost:8080/events', {
       method: 'POST',
       body: JSON.stringify(postRequestData),
@@ -327,7 +319,7 @@ function callAPI(postRequestData){
       }
     })
   .then(response => response.json())
-  .then(newResponse => newEventCreated(newResponse))
+  .then(newResponse => generateEventItemHTML(newResponse))
   .catch(error => console.log(error))
 }
 
