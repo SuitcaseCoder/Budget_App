@@ -97,75 +97,70 @@ const data = {
 };
 
 let selectedEvent = '';
-// SCREEN ONE - list of events
 
-// function renderEvents() {
-//   fetchGET();
-//   const eventsHTML = generateEventsHTML(newResponse);
-//   $('main').html(eventsHTML);
-// }
-
+// APPENDS LIST OF EVENTS FROM DB TO PAGE
 function appendToDOM(data){
   const eventsHTML = generateEventsHTML(data);
     $('main').html(eventsHTML);
 }
 
+//DISPLAYS EVENTS (NAME CHANGE TO displayEvents?)
 function generateEventsHTML(newResponse) {
-  // console.log(newResponse);
   const eventItems = newResponse.map(event => {
     return generateEventItemHTML(event);
   }).join('');
-// console.log(eventItems);
   return `<section class='events'>
         <h3>Events</h3>
-        <input class="addEventButton" type="button" value="+" role="button">Add Event</input>
+        <input class="addEventButton" id="addEventButton" type="button" value="+" role="button">Add Event</input>
         <ul class="eventItemsList">
         ${eventItems}
         </ul>
       </section>`;
 }
 
+//GENERATES EVENT ITEMS
 function generateEventItemHTML(eventsData) {
-  // console.log('this is the data', newResponse);
-  return `<li class="eventItem" id="${eventsData.title}">
+  return `<li class="eventItem" id="${eventsData.title}" data-id="${eventsData._id}">
       <p>${eventsData.title}</p>
       <p>${eventsData.date}</p>
       <p>Budget: $${eventsData.budget}</p>
     </li>`;
 }
 
-//RENDER NEW EVENT ITEM AFTER POST TO API MADE
+//RENDER NEW EVENT ITEM AFTER POST TO API MADE (CHANGE NAME TO displayEventAdded)
 function renderNewEventCreated(updatedEventsData){
-  console.log(updatedEventsData);
-
   $('.eventItemsList').append(`
-    <li class="eventItem" id="${updatedEventsData.title}">
+    <li class="eventItem" id="${updatedEventsData.title}" data-id="${updatedEventsData._id}">
         <p>${updatedEventsData.title}</p>
         <p>${updatedEventsData .date}</p>
         <p>Budget: $${updatedEventsData.budget}</p>
       </li>
     `)
 }
+
 //CHANGE SCREENS
 
+//LISTENS FOR EVENT SELECTED & CALLS FOR PAGE REPLACEMENT
 function listenEventSelected(){
-  $('.eventItemsList').on('click', 'li', function(e){
-    let eventSelected = $(this).attr('id');
-    
-    selectedEvent = eventSelected;
-    replaceHTML(selectedEvent);
+  $('main').on('click', 'li', function(e){
+    e.preventDefault();
+    let eventSelectedID = $(this).attr('data-id');
+    let selectedEvent = $(this).attr('id');
+    replaceHTML(selectedEvent, eventSelectedID);
   });
 }
 
-function replaceHTML(selectedEvent){
+//DISPLAYS EVENT'S EXPENSE PAGE SHOULD IT REPLACE MAIN AND APPEND EACH SECTION TO THE MAIN SECTION?
+function replaceHTML(selectedEvent, eventSelectedID){
   let budgetPageHTML = generateTotalBudgetHTML(selectedEvent);
   $('main').html(`
     <section id="budgetPageSection"></section>`);
   $('#budgetPageSection').append(budgetPageHTML);
-  renderExpenseItems();
+  renderExpenseItems(eventSelectedID);
 }
 
-function generateTotalBudgetHTML(selectedEvent){
+//RETURNS HTML FOR TOP SECTION OF EVENT'S EXPENSE PAGE
+function generateTotalBudgetHTML(selectedEvent, eventSelectedID){
   return `
     <section class="totBud">
       <h2>${selectedEvent}</h2>
@@ -174,15 +169,21 @@ function generateTotalBudgetHTML(selectedEvent){
         <input type="number" id="totBudget" name="totalBudget"
               min="10">
     </section>`;
-
 };
 
-function renderExpenseItems() {
+//DOES WAY TOO MUCH
+//HANDLES ADD EXPENSE BUTTONS
+//RENDERS EXPENSE LIST AND LIST ITEMS TWICE (WHY)
+//HANDLES SLIDER CHANGE AND TOT BUD CHANGES
+function renderExpenseItems(eventSelectedID) {
+  handleAddExpenseButton(eventSelectedID)
+  renderExpenseList()
   renderExpenseItems2();
   handleSliderChange();
   handleTotBudChange()
 }
 
+//HANDLES CHANGES TO SLIDER (AKA PERCENTAGE)
 function handleSliderChange(){
   $('body').on('change','input[type="range"]', function(e) {
     const name = $(this).closest('div').attr('id');
@@ -204,27 +205,27 @@ function handleSliderChange(){
         $(this).siblings('label').text($(this).val()+ '% of budget');
       }
     });
-    // a function which only re-renders the values under the slider
     $(`#${name}-value`).text(calculateExpenseAmt(val/100));
   })
 }
 
+//CALCULATES EXPENSE AMOUNT BASED ON INPUTS AND CHANGES
 function calculateExpenseAmt(percentage){
   let expenseBudget = data.events.find(event => event.name === selectedEvent).budget;
   let expenseTypeAmt = expenseBudget*percentage;
   return Math.floor(expenseTypeAmt);
 }
 
+//DISPLAYS LIST OF EXPENSES
 function renderExpenseItems2() {
   const expenseItemsHTML = generateExpensesHTML();
-  $('.expenses').html('');
+  $('.expenses').append('');
   $('#budgetPageSection').append(expenseItemsHTML);
 }
 
-
+// MAPS THROUGH DATA AND GENERATES LIST OF EXPENSE ITEMS
 function generateExpensesHTML(){
   const expenseItems = data.events.find(event => event.name === selectedEvent).expenses;
-
   const expenseItemsHTML = Object.values(expenseItems).map(expense => {
     return generateExpenseItems(expense);
   }).join('');
@@ -239,6 +240,24 @@ function generateExpensesHTML(){
   </section>`;
 }
 
+// DISPLAYS EXPENSE SECTION AND ADD EXPENSE BUTTON
+function renderExpenseList(){
+  $('main').append( `<section class='expenses'>
+    <h3>Expenses</h3>
+    <input class="addExpenseButton" id="addExpenseButton" type="button" value="+" role="button">Add Expense</input>
+  </section>`);
+}
+
+//HANDLES ADD EXPENSE BUTTON
+function handleAddExpenseButton(eventSelectedID){
+  $('body').on('click', '#addExpenseButton', function(e){
+    e.preventDefault();
+    generateAddExpenseForm(eventSelectedID);
+    handleExpenseSubmitButton(eventSelectedID);
+  })
+}
+
+// GENERATES/DISPLAYS EXPENSE DETAILS
 function generateExpenseItems(expense) {
   return `<li class="subCatItem">
       <p>${expense.name}</p>
@@ -247,6 +266,7 @@ function generateExpenseItems(expense) {
     </li>`;
 }
 
+// GENERATES SLIDER
 function generateSlider(name){
   let percentVal = data.events.find(event => event.name === selectedEvent).expenses[name].percentage;
 
@@ -256,9 +276,9 @@ function generateSlider(name){
     </div>`;
 }
 
+//HANDLES CHANGES TO THE TOTAL BUDGET
 function handleTotBudChange(){
   $('input[type="number"]').on('change', function(e){
-
     const val = $(this).val();
     data.events = data.events.map(el => {
       if (el.name == selectedEvent){
@@ -270,16 +290,40 @@ function handleTotBudChange(){
   })
 }
 
-// + BUTTONS - POST REQUESTS (EVENTS)
+// + BUTTONS
 
+// HANDLES ADD EVENT BUTTON
 function handleAddEventButton(){
-  //displays form or input fields
-
-  $('body').on('click', 'input[type="button"]', function(e){
+  $('body').on('click', '#addEventButton', function(e){
+    e.preventDefault();
     generateAddEventForm();
   })
 }
 
+//HANDLES SUBMIT EXPENSE BUTTON
+function handleExpenseSubmitButton(eventSelectedID){
+  $('form').on('click', '#submitNewExpense', function(e){
+    e.preventDefault(e);
+    getNewExpenseInputVals(eventSelectedID);
+  })
+}
+
+// GETS INPUT VALUES OF EXPENSE ADDED
+function getNewExpenseInputVals(eventSelectedID){
+  let newExpenseTitle = $('#expenseTitle').val();
+  let newExpensePercentage = $('#expensePercentage').val();
+
+  let newExpenseData = {
+    title: newExpenseTitle,
+    percentage: newExpensePercentage,
+  };
+
+  console.log(newExpenseData);
+  expensePOSTRequest(newExpenseData, eventSelectedID);
+  // callAPIPOST(postRequestData);
+}
+
+//DISPLAYS ADD EVENT FORM
 function generateAddEventForm(){
   //html for event form ONLY
   $('main').append(`
@@ -300,17 +344,18 @@ function generateAddEventForm(){
         <input class="submitEventButton" id="submitNewEvent" type="submit" value="Submit Event" role="button">
       </form>
     </div> `)
-
     onNewEventSubmit();
 }
 
+// HANDLES NEW EVENT BUTTON
 function onNewEventSubmit(){
-  $('form').on('click', 'input[type="submit"]', function(e){
-    event.preventDefault(e);
+  $('form').on('click', '#submitNewEvent', function(e){
+    e.preventDefault(e);
     getNewEventInputVals();
   });
 }
 
+//COLLECTS INPUT VALUES OF EVENT ADDED
 function getNewEventInputVals(){
     let newEventTitle = $('#eventTitle').val();
     let newEventDate = $('#eventDate').val();
@@ -326,8 +371,7 @@ function getNewEventInputVals(){
     callAPIPOST(postRequestData);
 }
 
-
-// CALL TO API
+// CALL TO API TO GET ALL EVENTS
 function fetchGET(){
   fetch('http://localhost:8080/events')
   .then(res => res.json())
@@ -335,7 +379,7 @@ function fetchGET(){
   .catch(error => console.log(error))
 }
 
-
+// POST CALL TO ADD NEW EVENT TO DB
 function callAPIPOST(postRequestData){
   fetch('http://localhost:8080/events', {
       method: 'POST',
@@ -352,8 +396,46 @@ function callAPIPOST(postRequestData){
   .catch(error => console.log(error))
 }
 
+//DISPLAYS ADD EXPENSE FORM
+function generateAddExpenseForm(eventSelectedID){
+  //html for event form ONLY
+  $('main').append(`
+    <div class="expenseFormDiv" data-id"${eventSelectedID}">
+      <form role="form" class="expenseForm">
+        <div>
+          <label for="expenseTitle">Name your Expense:</label>
+          <input type="text"  id="expenseTitle">
+        </div>
+        <div>
+          <label for="expensePercentage">Expense Percentage:</label>
+          <input type="number"  id="expensePercentage">
+        </div>
+        <input class="submitExpenseButton" id="submitNewExpense" type="submit" value="Submit Expense" role="button">
+      </form>
+    </div>
+    `)    // onNewEventSubmit();
+}
 
+// POST REQUEST TO ADD NEW EXPENSE
+function expensePOSTRequest(newExpenseData,eventSelectedID){
+  console.log(eventSelectedID);
+  fetch(`http://localhost:8080/events/${eventSelectedID}/expenses`, {
+      method: 'POST',
+      body: JSON.stringify(newExpenseData),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+  .then(response => response.json())
 
+  .then(newResponse =>
+    console.log(newResponse)
+    // generateEventItemHTML(newResponse)
+  )
+  .catch(error => console.log(error))
+}
+
+//
 $(fetchGET());
 $(listenEventSelected());
 $(handleAddEventButton());

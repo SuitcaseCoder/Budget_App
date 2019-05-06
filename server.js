@@ -44,7 +44,6 @@ app.post('/events', jsonParser, (req, res) => {
     }
   }
 
-//this
   Event
     .create({
       title: req.body.title,
@@ -59,24 +58,12 @@ app.post('/events', jsonParser, (req, res) => {
       console.log(err);
       res.status(500).json({message: 'Internal server error'});
     });
-// or this
-  // const item = Event.create(req.body.title, req.body.date, req.body.budget);
-  // res.status(201).json(item);
+
 });
 
-app.get('/expenses', (req,res) => {
-  Expense
-    .find()
-    .then(expenses => {
-      res.json(expenses)
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({message: 'internal server error'});
-    });
-});
+//POST EXPENSES
 
-app.post('/expenses', jsonParser, (req, res) => {
+app.post('/events/:id/expenses', jsonParser, (req, res) => {
   // ensure `name` and `budget` are in request body
   const requiredFields = ['title', 'percentage'];
   for (let i=0; i<requiredFields.length; i++) {
@@ -88,10 +75,64 @@ app.post('/expenses', jsonParser, (req, res) => {
     }
   }
 
-  const item = Expense.create(req.body.title, req.body.percentage);
-  res.status(201).json(item);
+  Expense
+    .create({
+      title: req.body.expenses.title,
+      percentage: req.body.expenses.percentage
+    })
+    .then(
+      event => res.status(201).json(event)
+      // .json(obj)
+    )
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({message: 'Internal server error'});
+    });
+
 });
 
+app.get('/events/:id', (req,res) => {
+  Event
+    .findById(req.params.id)
+    // .then(expense => res.json(expense.serialize()))
+    //
+    .then(expenses => {
+      return res.json(expenses.serialize())
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({message: 'internal server error'});
+    });
+});
+
+
+
+// app.post('/expenses', jsonParser, (req, res) => {
+//   // ensure `name` and `budget` are in request body
+//   const requiredFields = ['title', 'percentage'];
+//   for (let i=0; i<requiredFields.length; i++) {
+//     const field = requiredFields[i];
+//     if (!(field in req.body)) {
+//       const message = `Missing \`${field}\` in request body`
+//       console.error(message);
+//       return res.status(400).send(message);
+//     }
+//   }
+//
+//   Expense
+//     .create({
+//       title: req.body.title,
+//       percentage: req.body.percentage
+//     })
+//     .then(
+//       event => res.status(201).json(event)
+//     )
+//     .catch(err => {
+//       console.log(err);
+//       res.status(500).json({message: 'Internal Server Error'});
+//     });
+//
+// });
 
 let server;
 

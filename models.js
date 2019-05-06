@@ -15,7 +15,7 @@ const eventSchema = mongoose.Schema({
 
 const expenseSchema = mongoose.Schema({
   title: {type: String, required: true},
-  percentage: {type: Number}
+  percentage: {type: Number, required: true}
 });
 
 const Event = mongoose.model('Event', eventSchema);
