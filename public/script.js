@@ -316,9 +316,10 @@ function getNewExpenseInputVals(eventSelectedID){
   let newExpenseData = {
     title: newExpenseTitle,
     percentage: newExpensePercentage,
+    event: eventSelectedID
   };
 
-  console.log(newExpenseData);
+  // console.log(newExpenseData);
   expensePOSTRequest(newExpenseData, eventSelectedID);
   // callAPIPOST(postRequestData);
 }
@@ -413,13 +414,14 @@ function generateAddExpenseForm(eventSelectedID){
         <input class="submitExpenseButton" id="submitNewExpense" type="submit" value="Submit Expense" role="button">
       </form>
     </div>
-    `)    // onNewEventSubmit();
+    `)
 }
 
 // POST REQUEST TO ADD NEW EXPENSE
 function expensePOSTRequest(newExpenseData,eventSelectedID){
   console.log(eventSelectedID);
-  fetch(`http://localhost:8080/events/${eventSelectedID}/expenses`, {
+  console.log(newExpenseData);
+  fetch(`http://localhost:8080/expenses`, {
       method: 'POST',
       body: JSON.stringify(newExpenseData),
       headers: {

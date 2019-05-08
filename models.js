@@ -10,12 +10,12 @@ const eventSchema = mongoose.Schema({
     date: {type: Date, required: true,},
     budget: {type: Number, required: true},
     //expenses will be an array of objects
-    expenses: [{ type: mongoose.Schema.Types.ObjectId, ref:'Expense'}]
+    expenses: [{ type: mongoose.Schema.Types.ObjectId, ref:'Expense'}],
 });
 
 const expenseSchema = mongoose.Schema({
   title: {type: String, required: true},
-  percentage: {type: Number, required: true}
+  percentage: {type: Number, required: true},
 });
 
 const Event = mongoose.model('Event', eventSchema);

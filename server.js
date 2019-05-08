@@ -63,9 +63,9 @@ app.post('/events', jsonParser, (req, res) => {
 
 //POST EXPENSES
 
-app.post('/events/:id/expenses', jsonParser, (req, res) => {
+app.post('/expenses', jsonParser, (req, res) => {
   // ensure `name` and `budget` are in request body
-  const requiredFields = ['title', 'percentage'];
+  const requiredFields = ['title', 'percentage','event'];
   for (let i=0; i<requiredFields.length; i++) {
     const field = requiredFields[i];
     if (!(field in req.body)) {
@@ -77,11 +77,22 @@ app.post('/events/:id/expenses', jsonParser, (req, res) => {
 
   Expense
     .create({
-      title: req.body.expenses.title,
-      percentage: req.body.expenses.percentage
+      title: req.body.title,
+      percentage: req.body.percentage,
+    })
+    .then(expense => {
+      //query event model
+      return Event.findByIdAndUpdate(req.body.event, {
+        $push: {expenses:expense._id}
+      }).then( event => {
+        res.json(event)}
+      )
+      //find the specific event I need
+      //once I find that event
+      //then I add it to expenses
     })
     .then(
-      event => res.status(201).json(event)
+      expense =>   res.status(201).json(expense)
       // .json(obj)
     )
     .catch(err => {
