@@ -102,19 +102,37 @@ app.post('/expenses', jsonParser, (req, res) => {
 
 });
 
+// app.get('/events/:id', (req,res) => {
+//   Event
+//     .findById(req.params.id)
+//     // .then(expense => res.json(expense.serialize()))
+//     //
+//     .then(expenses => {
+//       return res.json(expenses.serialize())
+//     })
+//     .catch(err => {
+//       console.log(err);
+//       res.status(500).json({message: 'internal server error'});
+//     });
+// });
+
 app.get('/events/:id', (req,res) => {
   Event
+    // .find()
     .findById(req.params.id)
-    // .then(expense => res.json(expense.serialize()))
-    //
+    .populate('expenses')
+    .exec()
     .then(expenses => {
-      return res.json(expenses.serialize())
+      console.log(expenses)
+      return res.json(expenses)
     })
     .catch(err => {
       console.log(err);
-      res.status(500).json({message: 'internal server error'});
+      return res.status(500).json({message: 'internal server error'});
     });
 });
+
+//DELETE - CREATE DELETE REQUEST USING FIND BY ID: // ON SCRIPT.JS WRITE A FUNCTION THAT TRIGGERS THAT SPECIFIC ID/ELEMENT TO BE REMOVED FROM DOM
 
 
 

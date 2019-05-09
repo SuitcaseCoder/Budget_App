@@ -178,7 +178,7 @@ function generateTotalBudgetHTML(selectedEvent, eventSelectedID){
 function renderExpenseItems(eventSelectedID) {
   handleAddExpenseButton(eventSelectedID)
   renderExpenseList()
-  renderExpenseItems2();
+  // renderExpenseItems2();
   handleSliderChange();
   handleTotBudChange()
 }
@@ -217,15 +217,18 @@ function calculateExpenseAmt(percentage){
 }
 
 //DISPLAYS LIST OF EXPENSES
-function renderExpenseItems2() {
-  const expenseItemsHTML = generateExpensesHTML();
+function renderExpenseItems2(expenseData) {
+  console.log(expenseData);
+  const expenseItemsHTML = generateExpensesHTML(expenseData);
+  // console.log(expenseData);
   $('.expenses').append('');
   $('#budgetPageSection').append(expenseItemsHTML);
 }
 
 // MAPS THROUGH DATA AND GENERATES LIST OF EXPENSE ITEMS
-function generateExpensesHTML(){
-  const expenseItems = data.events.find(event => event.name === selectedEvent).expenses;
+function generateExpensesHTML(expenseData){
+  const expenseItems = expenseData.expenses;
+  console.log(expenseItems);
   const expenseItemsHTML = Object.values(expenseItems).map(expense => {
     return generateExpenseItems(expense);
   }).join('');
@@ -258,17 +261,17 @@ function handleAddExpenseButton(eventSelectedID){
 }
 
 // GENERATES/DISPLAYS EXPENSE DETAILS
-function generateExpenseItems(expense) {
+function generateExpenseItems(expenseData) {
   return `<li class="subCatItem">
-      <p>${expense.name}</p>
-      ${generateSlider(expense.name)}
-      <p id='${expense.name}-value'>\$${calculateExpenseAmt(expense.percentage)}</p>
+      <p>${expenseData.title}</p>
+      ${generateSlider(expenseData.title)}
+      <p id='${expenseData.title}-value'>\$${calculateExpenseAmt(expenseData.percentage)}</p>
     </li>`;
 }
 
 // GENERATES SLIDER
 function generateSlider(name){
-  let percentVal = data.events.find(event => event.name === selectedEvent).expenses[name].percentage;
+  let percentVal = expenseData.events.find(event => event.name === selectedEvent).expenseData[name].percentage;
 
   return `<div id=${name} class="slidecontainer">
       <input type="range" name="slider" min="0" max="100" value="${percentVal*100}" class="slider" id="myRange">
@@ -305,6 +308,7 @@ function handleExpenseSubmitButton(eventSelectedID){
   $('form').on('click', '#submitNewExpense', function(e){
     e.preventDefault(e);
     getNewExpenseInputVals(eventSelectedID);
+    // fetchGETExpense(eventSelectedID);
   })
 }
 
@@ -321,6 +325,8 @@ function getNewExpenseInputVals(eventSelectedID){
 
   // console.log(newExpenseData);
   expensePOSTRequest(newExpenseData, eventSelectedID);
+  //after the post usually, nothing gets called afterward so find a good spot for fetGETrequest
+  fetchGETExpense(eventSelectedID);
   // callAPIPOST(postRequestData);
 }
 
@@ -419,8 +425,6 @@ function generateAddExpenseForm(eventSelectedID){
 
 // POST REQUEST TO ADD NEW EXPENSE
 function expensePOSTRequest(newExpenseData,eventSelectedID){
-  console.log(eventSelectedID);
-  console.log(newExpenseData);
   fetch(`http://localhost:8080/expenses`, {
       method: 'POST',
       body: JSON.stringify(newExpenseData),
@@ -429,13 +433,22 @@ function expensePOSTRequest(newExpenseData,eventSelectedID){
       }
     })
   .then(response => response.json())
-
   .then(newResponse =>
-    console.log(newResponse)
+renderExpenseItems2(newResponse)
     // generateEventItemHTML(newResponse)
   )
   .catch(error => console.log(error))
 }
+
+function fetchGETExpense(eventSelectedID){
+  fetch(`http://localhost:8080/events/${eventSelectedID}`)
+  .then(res => res.json())
+  .then(expenseData => {
+    generateExpensesHTML(expenseData)
+  })
+  .catch(error => console.log(error))
+}
+
 
 //
 $(fetchGET());
