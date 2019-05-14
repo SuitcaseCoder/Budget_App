@@ -218,20 +218,21 @@ function calculateExpenseAmt(percentage){
 
 //DISPLAYS LIST OF EXPENSES
 function renderExpenseItems2(expenseData) {
-  console.log(expenseData);
-  const expenseItemsHTML = generateExpensesHTML(expenseData);
   // console.log(expenseData);
+  const expenseItemsHTML = generateExpensesHTML(expenseData);
   $('.expenses').append('');
   $('#budgetPageSection').append(expenseItemsHTML);
 }
 
 // MAPS THROUGH DATA AND GENERATES LIST OF EXPENSE ITEMS
 function generateExpensesHTML(expenseData){
+  // console.log(expenseData);
   const expenseItems = expenseData.expenses;
-  console.log(expenseItems);
+  // console.log(expenseItems);
   const expenseItemsHTML = Object.values(expenseItems).map(expense => {
-    return generateExpenseItems(expense);
+    return generateExpenseItems(expenseItems);
   }).join('');
+
 
   return `<section class='expenses'>
     <h3>Expenses</h3>
@@ -261,16 +262,17 @@ function handleAddExpenseButton(eventSelectedID){
 }
 
 // GENERATES/DISPLAYS EXPENSE DETAILS
-function generateExpenseItems(expenseData) {
+function generateExpenseItems(expenseItems) {
+  console.log(expenseItems);
   return `<li class="subCatItem">
-      <p>${expenseData.title}</p>
-      ${generateSlider(expenseData.title)}
-      <p id='${expenseData.title}-value'>\$${calculateExpenseAmt(expenseData.percentage)}</p>
+      <p>${expenseItems.title}</p>
+      ${generateSlider(expenseItems.title)}
+      <p id='${expenseItems.title}-value'>\$${calculateExpenseAmt(expenseItems.percentage)}</p>
     </li>`;
 }
 
 // GENERATES SLIDER
-function generateSlider(name){
+function generateSlider(expenseData){
   let percentVal = expenseData.events.find(event => event.name === selectedEvent).expenseData[name].percentage;
 
   return `<div id=${name} class="slidecontainer">
@@ -326,7 +328,7 @@ function getNewExpenseInputVals(eventSelectedID){
   // console.log(newExpenseData);
   expensePOSTRequest(newExpenseData, eventSelectedID);
   //after the post usually, nothing gets called afterward so find a good spot for fetGETrequest
-  fetchGETExpense(eventSelectedID);
+  // fetchGETExpense(eventSelectedID);
   // callAPIPOST(postRequestData);
 }
 
@@ -434,17 +436,22 @@ function expensePOSTRequest(newExpenseData,eventSelectedID){
     })
   .then(response => response.json())
   .then(newResponse =>
-renderExpenseItems2(newResponse)
+    // console.log(newResponse)
+    fetchGETExpense(newResponse, eventSelectedID)
+// renderExpenseItems2(newResponse)
     // generateEventItemHTML(newResponse)
   )
   .catch(error => console.log(error))
 }
 
-function fetchGETExpense(eventSelectedID){
+function fetchGETExpense(newResponse, eventSelectedID){
   fetch(`http://localhost:8080/events/${eventSelectedID}`)
   .then(res => res.json())
   .then(expenseData => {
-    generateExpensesHTML(expenseData)
+    // console.log(expenseData)
+    // console.log(eventSelectedID)
+    renderExpenseItems2(expenseData)
+    // generateExpensesHTML(expenseData)
   })
   .catch(error => console.log(error))
 }
