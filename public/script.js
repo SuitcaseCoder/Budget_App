@@ -228,30 +228,31 @@ function renderExpenseItems2(expenseData) {
 function generateExpensesHTML(expenseData){
 
   const expenseItems = expenseData.expenses;
-
-  const expenseItemsHTML = Object.values(expenseItems).map(expense => {
-    return
-    generateExpenseItems(expense);
-  }).join('');
-  console.log(expenseItems);
-  amendingNewExpenses(expenseItems);
-  console.log('yo again!');
-}
-
-function amendingNewExpenses(expenseItems){
-  // generateExpenseItems(expenseItems);
 console.log(expenseItems);
+  const expenseItemsHTML = expenseItems.map(expense => {
+  // Object.values(expenseItems).map(expense => {
+    // return
+    // console.log(expense);
+    // return expense
+    generateExpenseItems(expense);
+  })
+  // .join('');
+  // console.log(expenseItemsHTML);
+  // amendingNewExpenses(expenseItemsHTML);
+  // console.log('yo again!');
+// }
+//
+// function amendingNewExpenses(expenseItemsHTML){
+//   console.log(expenseItemsHTML);
+//   // generateExpenseItems(expenseItemsHTML);
   $('.expenses').append(`<section class='expenses'>
     <h3>Expenses</h3>
-    <p>hey hey look at me on like 240</p>
 
     <ul>
-      ${expenseItems}
+      ${expenseItemsHTML}
     </ul>
 
   </section>`);
-
-
 }
 
 // DISPLAYS EXPENSE SECTION AND ADD EXPENSE BUTTON
@@ -272,21 +273,23 @@ function handleAddExpenseButton(eventSelectedID){
 }
 
 // GENERATES/DISPLAYS EXPENSE DETAILS
-function generateExpenseItems(expense) {
-
-  console.log(expense);
-  // console.log(expenseItems[2].title);
+function generateExpenseItems(expenseItemsHTML) {
+  // amendingNewExpenses(expenseItemsHTML);
+  console.log(expenseItemsHTML);
+  console.log(expenseItemsHTML.title);
   return `<li class="subCatItem">
-      <p>${expense.title}</p>
-      ${generateSlider(expenseItems.title)}
-      <p id='${expenseItems.title}-value'>\$${calculateExpenseAmt(expenseItems.percentage)}</p>
+      <p>${expenseItemsHTML.title}</p>
+      ${generateSlider(expenseItemsHTML.title)}
+      <p id='${expenseItemsHTML.title}-value'>\$${calculateExpenseAmt(expenseItemsHTML.percentage)}</p>
     </li>`;
 }
 
 // GENERATES SLIDER
 function generateSlider(expenseData){
 
+
   let percentVal = expenseData.events.find(event => event.name === selectedEvent).expenseData[name].percentage;
+  console.log(percentVal);
 
   return `<div id=${name} class="slidecontainer">
       <input type="range" name="slider" min="0" max="100" value="${percentVal*100}" class="slider" id="myRange">
