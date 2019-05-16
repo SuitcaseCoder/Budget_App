@@ -22,7 +22,6 @@ app.get('/events', (req,res) => {
     .populate('expenses')
     .exec()
     .then(events => {
-      console.log(events)
       return res.json(events)
     })
     .catch(err => {
@@ -123,7 +122,6 @@ app.get('/events/:id', (req,res) => {
     .populate('expenses')
     .exec()
     .then(expenses => {
-      console.log(expenses)
       return res.json(expenses)
     })
     .catch(err => {

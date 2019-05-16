@@ -178,7 +178,6 @@ function generateTotalBudgetHTML(selectedEvent, eventSelectedID){
 function renderExpenseItems(eventSelectedID) {
   handleAddExpenseButton(eventSelectedID)
   renderExpenseList()
-  // renderExpenseItems2();
   handleSliderChange();
   handleTotBudChange()
 }
@@ -218,8 +217,13 @@ function calculateExpenseAmt(percentage){
 
 //DISPLAYS LIST OF EXPENSES
 function renderExpenseItems2(expenseData) {
-  // console.log(expenseData);
-  const expenseItemsHTML = generateExpensesHTML(expenseData);
+
+  const expenseItems = expenseData.expenses;
+  const expenseItemsHTML = expenseItems.map(expense => {
+    generateExpenseItems(expense);
+  })
+console.log(expenseItemsHTML);
+  // const expenseItemsHTML = generateExpensesHTML(expenseData);
   $('.expenses').append('');
   $('#budgetPageSection').append(expenseItemsHTML);
 }
@@ -227,15 +231,15 @@ function renderExpenseItems2(expenseData) {
 // MAPS THROUGH DATA AND GENERATES LIST OF EXPENSE ITEMS
 function generateExpensesHTML(expenseData){
 
-  const expenseItems = expenseData.expenses;
-console.log(expenseItems);
-  const expenseItemsHTML = expenseItems.map(expense => {
-  // Object.values(expenseItems).map(expense => {
-    // return
-    // console.log(expense);
-    // return expense
-    generateExpenseItems(expense);
-  })
+//   const expenseItems = expenseData.expenses;
+// console.log(expenseItems);
+//   const expenseItemsHTML = expenseItems.map(expense => {
+//   // Object.values(expenseItems).map(expense => {
+//     // return
+//     // console.log(expense);
+//     // return expense
+//     generateExpenseItems(expense);
+//   })
   // .join('');
   // console.log(expenseItemsHTML);
   // amendingNewExpenses(expenseItemsHTML);
@@ -323,6 +327,7 @@ function handleAddEventButton(){
 
 //HANDLES SUBMIT EXPENSE BUTTON
 function handleExpenseSubmitButton(eventSelectedID){
+  //target that form and change t submit
   $('form').on('click', '#submitNewExpense', function(e){
     e.preventDefault(e);
     getNewExpenseInputVals(eventSelectedID);
