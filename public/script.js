@@ -1,112 +1,16 @@
-const data = {
-  events: [
-    {
-      name: 'Marathon Weekend',
-      date:'September 14, 2019',
-      budget: 1000,
-      expenses: {
-        'food': {
-          name: 'food',
-          percentage: 0
-        },
-        'transportation': {
-          name: 'transportation',
-          percentage: 0
-        },
-        'accomodation':{
-          name: 'accomodation',
-          percentage: 0
-        }
-      }
-    },
-    {
-      name: 'Surprise Party',
-      date:'May 28, 2019',
-      budget: 1000,
-      expenses: {
-        'food': {
-          name: 'food',
-          percentage: 0
-        },
-        'transportation': {
-          name: 'transportation',
-          percentage: 0
-        },
-        'accomodation':{
-          name: 'accomodation',
-          percentage: 0
-        }
-      }
-    },
-    {
-      name: 'Camping Trip',
-      date: 'August 23, 2019',
-      budget: 1000,
-      expenses: {
-        'food': {
-          name: 'food',
-          percentage: 0
-        },
-        'transportation': {
-          name: 'transportation',
-          percentage: 0
-        },
-        'accomodation':{
-          name: 'accomodation',
-          percentage: 0
-        }
-      }
-    },
-    {
-      name: 'Photography Workshop',
-      date: 'October 22, 2019',
-      budget: 1000,
-      expenses: {
-        'food': {
-          name: 'food',
-          percentage: 0
-        },
-        'transportation': {
-          name: 'transportation',
-          percentage: 0
-        },
-        'accomodation':{
-          name: 'accomodation',
-          percentage: 0
-        }
-      }
-    }
-  ],
-  users: [
-    {
-      name: 'Fritz',
-      age:16,
-      username: 'fritz-o-polous'
-    },
-    {
-      name: 'Rosie',
-      age: 8,
-      username: 'elGatoVolador'
-    },
-    {
-      name: 'Shiner',
-      age: 7,
-      username: 'shi_Shi'
-    }
-  ],
-};
 
+let globalData = '';
 let selectedEvent = '';
 
 // APPENDS LIST OF EVENTS FROM DB TO PAGE
-function appendToDOM(data){
-  const eventsHTML = generateEventsHTML(data);
+function appendToDOM(){
+  const eventsHTML = generateEventsHTML();
     $('main').html(eventsHTML);
 }
 
 //DISPLAYS EVENTS (NAME CHANGE TO displayEvents?)
-function generateEventsHTML(newResponse) {
-  const eventItems = newResponse.map(event => {
+function generateEventsHTML() {
+  const eventItems = globalData.map(event => {
     return generateEventItemHTML(event);
   }).join('');
   return `<section class='events'>
@@ -143,24 +47,24 @@ function renderNewEventCreated(updatedEventsData){
 //LISTENS FOR EVENT SELECTED & CALLS FOR PAGE REPLACEMENT
 function listenEventSelected(){
   $('main').on('click', 'li', function(e){
-    e.preventDefault();
     let eventSelectedID = $(this).attr('data-id');
-    let selectedEvent = $(this).attr('id');
-    replaceHTML(selectedEvent, eventSelectedID);
+    // I TOOK OFF 'LET' FROM HERE, SHOULD IT GO BACK?
+     selectedEvent = $(this).attr('id');
+    replaceHTML(selectedEvent,eventSelectedID);
+    // fetchGETExpense(selectedEvent, eventSelectedID);
   });
 }
 
 //DISPLAYS EVENT'S EXPENSE PAGE SHOULD IT REPLACE MAIN AND APPEND EACH SECTION TO THE MAIN SECTION?
 function replaceHTML(selectedEvent, eventSelectedID){
-  let budgetPageHTML = generateTotalBudgetHTML(selectedEvent);
-  $('main').html(`
-    <section id="budgetPageSection"></section>`);
-  $('#budgetPageSection').append(budgetPageHTML);
-  renderExpenseItems(eventSelectedID);
+  let totalBudgetSection = generateTotBudSection(selectedEvent);
+  let expenseList = generateExpenseSection(selectedEvent, eventSelectedID);
+  $('main').html(``);
+  $('main').append(totalBudgetSection);
+  $('main').append(expenseList);
 }
 
-//RETURNS HTML FOR TOP SECTION OF EVENT'S EXPENSE PAGE
-function generateTotalBudgetHTML(selectedEvent, eventSelectedID){
+function generateTotBudSection(selectedEvent){
   return `
     <section class="totBud">
       <h2>${selectedEvent}</h2>
@@ -169,7 +73,39 @@ function generateTotalBudgetHTML(selectedEvent, eventSelectedID){
         <input type="number" id="totBudget" name="totalBudget"
               min="10">
     </section>`;
-};
+}
+
+
+function generateExpenseSection(selectedEvent, eventSelectedID){
+  return `
+  <section class="expenses">
+    <h3>Expenses</h3>
+    <input class="addExpenseButton" id="addExpenseButton" type="button" value="+" role="button">Add Expense</input>
+    <ul class="expenseListSection">
+    ${renderExpenseItems2(selectedEvent, eventSelectedID)}
+    </ul>
+  </section>`
+}
+
+// function replaceHTML(selectedEvent, eventSelectedID){
+//   let budgetPageHTML = generateTotalBudgetHTML(selectedEvent);
+//   $('main').html(`
+//     <section id="budgetPageSection"></section>`);
+//   $('#budgetPageSection').append(budgetPageHTML);
+//   renderExpenseItems(eventSelectedID);
+// }
+
+//RETURNS HTML FOR TOP SECTION OF EVENT'S EXPENSE PAGE
+// function generateTotalBudgetHTML(selectedEvent, eventSelectedID){
+//   return `
+//     <section class="totBud">
+//       <h2>${selectedEvent}</h2>
+//       <h3>Visualize your budget for your upcoming ${selectedEvent}</h3>
+//         <label for="totalBudget">What's your budget?:</label>
+//         <input type="number" id="totBudget" name="totalBudget"
+//               min="10">
+//     </section>`;
+// };
 
 //DOES WAY TOO MUCH
 //HANDLES ADD EXPENSE BUTTONS
@@ -209,62 +145,48 @@ function handleSliderChange(){
 }
 
 //CALCULATES EXPENSE AMOUNT BASED ON INPUTS AND CHANGES
-function calculateExpenseAmt(percentage){
-  let expenseBudget = data.events.find(event => event.name === selectedEvent).budget;
-  let expenseTypeAmt = expenseBudget*percentage;
+function calculateExpenseAmt(expense,percentVal,eventSelectedID){
+  //EXPENSE BUDGET SHOULD BE THE CURRENT BUDGET FOR SELECETED EVENT'S EXPENSE not the percentage, right?
+
+// expense.map(testingSomething => {
+//   if (testingSomething.)
+// })
+  console.log(eventSelectedID);
+  //here: if event = eventSelectedID === eventSelectedID then return .budget
+
+  let expenseBudget = globalData.find(event => event._id === eventSelectedID).budget;
+  console.log(expenseBudget);
+  let expenseTypeAmt = expenseBudget*percentVal;
+  console.log(expenseTypeAmt);
   return Math.floor(expenseTypeAmt);
 }
 
 //DISPLAYS LIST OF EXPENSES
-function renderExpenseItems2(expenseData) {
+function renderExpenseItems2(selectedEvent, eventSelectedID) {
+  const expenseItems = globalData.find(event => event.title === selectedEvent).expenses;
+  const eachExpense = expenseItems.map(expenseItem =>
+    {return generateExpenseItemDetails(expenseItem, eventSelectedID)}).join('');
 
-  const expenseItems = expenseData.expenses;
-  const expenseItemsHTML = expenseItems.map(expense => {
-    generateExpenseItems(expense);
-  })
-console.log(expenseItemsHTML);
-  // const expenseItemsHTML = generateExpensesHTML(expenseData);
-  $('.expenses').append('');
-  $('#budgetPageSection').append(expenseItemsHTML);
+returnExpenseList(eachExpense);
 }
 
-// MAPS THROUGH DATA AND GENERATES LIST OF EXPENSE ITEMS
-function generateExpensesHTML(expenseData){
-
-//   const expenseItems = expenseData.expenses;
-// console.log(expenseItems);
-//   const expenseItemsHTML = expenseItems.map(expense => {
-//   // Object.values(expenseItems).map(expense => {
-//     // return
-//     // console.log(expense);
-//     // return expense
-//     generateExpenseItems(expense);
-//   })
-  // .join('');
-  // console.log(expenseItemsHTML);
-  // amendingNewExpenses(expenseItemsHTML);
-  // console.log('yo again!');
-// }
-//
-// function amendingNewExpenses(expenseItemsHTML){
-//   console.log(expenseItemsHTML);
-//   // generateExpenseItems(expenseItemsHTML);
-  $('.expenses').append(`<section class='expenses'>
-    <h3>Expenses</h3>
-
+function returnExpenseList(eachExpense){
+  console.log(eachExpense);
+  return $('.main').append(`
     <ul>
-      ${expenseItemsHTML}
+      ${eachExpense}
     </ul>
-
-  </section>`);
+`);
+console.log('made it here');
 }
 
 // DISPLAYS EXPENSE SECTION AND ADD EXPENSE BUTTON
 function renderExpenseList(){
-  $('main').append( `<section class='expenses'>
+  return `
+  <section class='expenses'>
     <h3>Expenses</h3>
     <input class="addExpenseButton" id="addExpenseButton" type="button" value="+" role="button">Add Expense</input>
-  </section>`);
+  </section>`
 }
 
 //HANDLES ADD EXPENSE BUTTON
@@ -277,27 +199,23 @@ function handleAddExpenseButton(eventSelectedID){
 }
 
 // GENERATES/DISPLAYS EXPENSE DETAILS
-function generateExpenseItems(expenseItemsHTML) {
-  // amendingNewExpenses(expenseItemsHTML);
-  console.log(expenseItemsHTML);
-  console.log(expenseItemsHTML.title);
-  return `<li class="subCatItem">
-      <p>${expenseItemsHTML.title}</p>
-      ${generateSlider(expenseItemsHTML.title)}
-      <p id='${expenseItemsHTML.title}-value'>\$${calculateExpenseAmt(expenseItemsHTML.percentage)}</p>
+function generateExpenseItemDetails(expense, eventSelectedID) {
+  console.log(eventSelectedID);
+  let percentVal = expense.percentage;
+  return `
+    <li class="subCatItem">
+      <p>${expense.title}</p>
+      ${generateSlider(expense,percentVal)}
+      <p id="${expense.title}">\$${calculateExpenseAmt(expense,percentVal, eventSelectedID)}</p>
     </li>`;
 }
 
 // GENERATES SLIDER
-function generateSlider(expenseData){
-
-
-  let percentVal = expenseData.events.find(event => event.name === selectedEvent).expenseData[name].percentage;
+function generateSlider(expense,percentVal){
   console.log(percentVal);
-
-  return `<div id=${name} class="slidecontainer">
+  return `<div id="${expense.title}" class="slidecontainer">
       <input type="range" name="slider" min="0" max="100" value="${percentVal*100}" class="slider" id="myRange">
-      <label for="slider">percent of budget<label>
+      <label for="slider">percent of budget</label>
     </div>`;
 }
 
@@ -320,7 +238,6 @@ function handleTotBudChange(){
 // HANDLES ADD EVENT BUTTON
 function handleAddEventButton(){
   $('body').on('click', '#addEventButton', function(e){
-    e.preventDefault();
     generateAddEventForm();
   })
 }
@@ -331,7 +248,6 @@ function handleExpenseSubmitButton(eventSelectedID){
   $('form').on('click', '#submitNewExpense', function(e){
     e.preventDefault(e);
     getNewExpenseInputVals(eventSelectedID);
-    // fetchGETExpense(eventSelectedID);
   })
 }
 
@@ -349,7 +265,6 @@ function getNewExpenseInputVals(eventSelectedID){
   // console.log(newExpenseData);
   expensePOSTRequest(newExpenseData, eventSelectedID);
   //after the post usually, nothing gets called afterward so find a good spot for fetGETrequest
-  // fetchGETExpense(eventSelectedID);
   // callAPIPOST(postRequestData);
 }
 
@@ -396,8 +311,6 @@ function getNewEventInputVals(){
       date: newEventDate,
       budget: newEventBudget
     };
-
-    console.log(postRequestData);
     callAPIPOST(postRequestData);
 }
 
@@ -405,7 +318,11 @@ function getNewEventInputVals(){
 function fetchGET(){
   fetch('http://localhost:8080/events')
   .then(res => res.json())
-  .then(newResponse => appendToDOM(newResponse))
+  .then(newResponse => {
+    globalData = newResponse;
+    console.log(globalData);
+    appendToDOM();
+  })
   .catch(error => console.log(error))
 }
 
@@ -420,7 +337,7 @@ function callAPIPOST(postRequestData){
     })
   .then(response => response.json())
   .then(newResponse =>
-    renderNewEventCreated(newResponse)
+  renderNewEventCreated(newResponse)
     // generateEventItemHTML(newResponse)
   )
   .catch(error => console.log(error))
@@ -457,26 +374,13 @@ function expensePOSTRequest(newExpenseData,eventSelectedID){
     })
   .then(response => response.json())
   .then(newResponse =>
-    // console.log(newResponse)
-    fetchGETExpense(newResponse, eventSelectedID)
+    console.log(newResponse)
+    // fetchGETExpense(newResponse, eventSelectedID)
 // renderExpenseItems2(newResponse)
     // generateEventItemHTML(newResponse)
   )
   .catch(error => console.log(error))
 }
-
-function fetchGETExpense(newResponse, eventSelectedID){
-  fetch(`http://localhost:8080/events/${eventSelectedID}`)
-  .then(res => res.json())
-  .then(expenseData => {
-    // console.log(expenseData)
-    // console.log(eventSelectedID)
-    renderExpenseItems2(expenseData)
-    // generateExpensesHTML(expenseData)
-  })
-  .catch(error => console.log(error))
-}
-
 
 //
 $(fetchGET());
