@@ -132,7 +132,12 @@ app.get('/events/:id', (req,res) => {
 
 //DELETE - CREATE DELETE REQUEST USING FIND BY ID: // ON SCRIPT.JS WRITE A FUNCTION THAT TRIGGERS THAT SPECIFIC ID/ELEMENT TO BE REMOVED FROM DOM
 
-
+app.delete('/events/:id', (req, res) => {
+  Event
+   .findByIdAndRemove(req.params.id)
+   .then(event => status(204).end())
+   .catch(err => res.status(500).json({message:'Internal server error'}));
+})
 
 // app.post('/expenses', jsonParser, (req, res) => {
 //   // ensure `name` and `budget` are in request body
