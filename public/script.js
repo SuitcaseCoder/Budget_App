@@ -64,13 +64,13 @@ function replaceHTML(selectedEvent, eventSelectedID){
   $('main').append(expenseList);
   handleAddExpenseButton(eventSelectedID);
 //----------------- NOTE CHANGE ---------------------
-  handleSliderChange({target: null}, eventSelectedID);
+listenSliderChange({target: null});
+  // handleSliderChange({target: null}, eventSelectedID);
 }
 
 //GENERATES TOTAL BUDGET SECTION HTML
 function generateTotBudSection(selectedEvent){
   let displayBudget = globalData.find(event => event.title === selectedEvent).budget;
-  console.log(displayBudget);
   return `
     <section class="totBud">
       <h2>${selectedEvent}</h2>
@@ -93,10 +93,50 @@ function generateExpenseSection(selectedEvent, eventSelectedID){
   </section>`
 }
 
-//IS THIS EVEN CALLED FOR?
-function renderExpenseItems(eventSelectedID) {
-  renderExpenseList();
-  handleTotBudChange();
+//DISPLAYS LIST OF EXPENSES
+function renderExpenseItems2(selectedEvent, eventSelectedID) {
+  const expenseItems = globalData.find(event => event.title === selectedEvent).expenses;
+  const eachExpense = expenseItems.map(expenseItem =>
+    {return generateExpenseItemDetails(expenseItem, eventSelectedID)}).join('');
+
+  return returnExpenseList(eachExpense);
+}
+
+// GENERATES/DISPLAYS EXPENSE DETAILS
+function generateExpenseItemDetails(expense, eventSelectedID) {
+  let percentVal = expense.percentage;
+  return `
+    <li class="subCatItem">
+      <p>${expense.title}</p>
+      ${generateSlider(expense,percentVal)}
+      <p id="${expense.title}">\$${calculateExpenseAmt(percentVal, eventSelectedID)}</p>
+    </li>`;
+}
+
+// GENERATES SLIDER
+function generateSlider(expense,percentVal){
+  return `<div id="${expense._id}" class="slidecontainer">
+      <input type="range" name="slider" min="0" max="100" value="${percentVal}" class="slider" id="myRange">
+      <label for="slider">${percentVal}% of budget</label>
+    </div>`;
+}
+
+//CALCULATES EXPENSE AMOUNT BASED ON INPUTS AND CHANGES
+function calculateExpenseAmt(percentVal,eventSelectedID){
+  ids = globalData.map(function(event) {
+    return event._id
+  });
+  let expenseBudget = globalData.find(event => event._id === eventSelectedID).budget;
+  let expenseTypeAmt = expenseBudget * (percentVal / 100);
+  return Math.floor(expenseTypeAmt);
+}
+
+function returnExpenseList(eachExpense){
+  return $('body').append(`
+    <ul class="expenseListSection">
+      ${eachExpense}
+    </ul>
+`);
 }
 
 //HANDLES CHANGES TO SLIDER (AKA PERCENTAGE)
@@ -105,29 +145,24 @@ function handleSliderChange(domEvent, event_id){
   // GET CURRENT SLIDER INFO
   // domeEvent.target returns the element that triggered the event
   let target = domEvent.target
-  console.log(target);
   const nameOfExpense = $(target).closest('div').attr('id');
-  console.log(nameOfExpense);
   const valOfSlider = $(target).val();
-  console.log(valOfSlider);
-
   //SYNCING UP ALL PERCENTAGES
   $(target).siblings('label').text(valOfSlider + '% of budget')
-    // globalData.find(event => event._id === eventSelectedID).budget;
-    // globalData.find(event => event.title === selectedEvent).expenses[name].percentage = val/100;
+  console.log(valOfSlider);
 
   //CALCULATING NEW PERCENTAGE FOR EACH OF THE EXPENSES
   if (!event_id)
     event_id = $(target).parents('li').data('eventId');
   let expItems = globalData.find(event => event._id === event_id).expenses;
-  console.log(expItems);
   let expPercentage = expItems.map(exp => {
+    // console.log(valOfSlider)
     return exp.percentage = valOfSlider / 100
   });
 
   //VALIDATION SO PERCENTAGES DON'T SURPASS TOTAL OF 100
   let remainingPercentage = 100 - valOfSlider;
-  console.log(remainingPercentage);
+  // console.log(remainingPercentage);
 
   // ITERATE OVER EACH SLIDER
     $('input[type="range"]').each(function(){
@@ -150,39 +185,59 @@ function handleSliderChange(domEvent, event_id){
       }
     });
 
-    console.log(valOfSlider);
-    $(`#${nameOfExpense}-value`).text(calculateExpenseAmt(valOfSlider / 100 , event_id));
+    $(`#${nameOfExpense}-value`).text(calculateExpenseAmt(valOfSlider/100 , event_id));
 }
 
-//CALCULATES EXPENSE AMOUNT BASED ON INPUTS AND CHANGES
-function calculateExpenseAmt(percentVal,eventSelectedID){
-  console.log(percentVal);
-  ids = globalData.map(function(event) {
-    return event._id
-  });
-  let expenseBudget = globalData.find(event => event._id === eventSelectedID).budget;
-  console.log(expenseBudget);
-  let expenseTypeAmt = expenseBudget * (percentVal / 100);
-  console.log(Math.floor(expenseTypeAmt));
-  return Math.floor(expenseTypeAmt);
+function listenSliderChange(domEvent){
+    // GET CURRENT SLIDER INFO
+    let target = domEvent.target
+    const nameOfExpense = $(target).closest('div').attr('id');
+
+    const valOfSlider = $(target).val();
+    updateSliderVal(valOfSlider,nameOfExpense);
+    recalculateExpenseAmt(valOfSlider,target);
 }
 
-//DISPLAYS LIST OF EXPENSES
-function renderExpenseItems2(selectedEvent, eventSelectedID) {
-  const expenseItems = globalData.find(event => event.title === selectedEvent).expenses;
-  const eachExpense = expenseItems.map(expenseItem =>
-    {return generateExpenseItemDetails(expenseItem, eventSelectedID)}).join('');
-
-  return returnExpenseList(eachExpense);
+//DISPLAYS THE SLIDER'S CHANGED VALUE ACCURATELY
+function updateSliderVal(valOfSlider, nameOfExpense){
+  console.log(valOfSlider);
+  $('input[type="range"]').each(function(){
+    // IF ITS THE SLIDER BEING CHANGED, UPDATE THE LABEL
+    if($(this).closest('div').attr('id')==nameOfExpense){
+    $(this).siblings('label').text($(this).val()+ '% of budget');
+  }
+})
 }
 
-function returnExpenseList(eachExpense){
-  return $('body').append(`
-    <ul class="expenseListSection">
-      ${eachExpense}
-    </ul>
-`);
+function recalculateExpenseAmt(valOfSlider,target){
+//THOUGHT: I COULD MAKE EVENTSELECTEDID/OBJEC_ID A GLOBAL VARIABLE LIKE SELECTED EVENT
+  let currentEventBud = globalData.find(event => event.title === selectedEvent).budget;
+  let recalculatedAmt = (currentEventBud * (valOfSlider / 100));
+  return updateExpAmt(recalculatedAmt,target);
 }
+
+function updateExpAmt(recalculatedAmt,target){
+  //THIS IS WHERE I'M STUCK. HERE'S WHAT I GOTTA DO:
+
+  // -- target/find the expense we're on
+  console.log(target);
+
+  //how do I dive OUT of the slider div and back into the li>p>text
+  // -- find the element that holds the 'expenseTypeAmt' & cahnge its text to 'recalculatedAmt'
+  const newExpAmt = $(target).parent().parent().closest('p').attr(`id="${selectedEvent}`);
+  //I think the above gave me the list element, so now how do I dive into the text of p that I want, when the id of p is one of these ${} & change the text by using .text(recalculatedAmt); at the end
+  console.log(newExpAmt);
+
+
+}
+//IS THIS EVEN CALLED FOR?
+// function renderExpenseItems(eventSelectedID) {
+//   renderExpenseList();
+//   handleTotBudChange();
+// }
+
+
+
 
 //HANDLES ADD EXPENSE BUTTON
 function handleAddExpenseButton(eventSelectedID){
@@ -192,16 +247,7 @@ function handleAddExpenseButton(eventSelectedID){
   })
 }
 
-// GENERATES/DISPLAYS EXPENSE DETAILS
-function generateExpenseItemDetails(expense, eventSelectedID) {
-  let percentVal = expense.percentage;
-  return `
-    <li class="subCatItem">
-      <p>${expense.title}</p>
-      ${generateSlider(expense,percentVal)}
-      <p id="${expense.title}">\$${calculateExpenseAmt(percentVal, eventSelectedID)}</p>
-    </li>`;
-}
+
 //
 // function renderNewExpenseCreated(expenseCreatedDetails,eventSelectedID){
 // let newExpenses = (globalData.find(event => event._id === eventSelectedID).expenses)
@@ -213,15 +259,6 @@ function generateExpenseItemDetails(expense, eventSelectedID) {
 //       <p id="${newExpenses.title}">\$${calculateExpenseAmt()}</p>
 //     </li>`);
 // }
-
-// GENERATES SLIDER
-function generateSlider(expense,percentVal){
-  console.log(percentVal);
-  return `<div id="${expense._id}" class="slidecontainer">
-      <input type="range" name="slider" min="0" max="100" value="${percentVal}" class="slider" id="myRange">
-      <label for="slider">${percentVal}% of budget</label>
-    </div>`;
-}
 
 //HANDLES CHANGES TO THE TOTAL BUDGET
 function handleTotBudChange(){
@@ -372,14 +409,12 @@ function generateAddExpenseForm(eventSelectedID){
 function onDeleteEventItem(){
   $('main').on('click', '#eventDeleteButton', eventItem => {
     deleteEventRequest(eventItem);
-    console.log(eventItem);
 
   })
 }
 
 function deleteEventRequest(eventItem){
   //I NEED TO PASS THE ID OF THE EVENT I'M CLICKING TO DELETE THE EVENT I'M CLICKING ON
-  console.log(eventItem);
   fetch('http://localhost:8080/events/:id', {
     method: 'DELETE',
     headers: {'Content-Type': 'application/json'},
@@ -400,9 +435,7 @@ function expensePOSTRequest(newExpenseData,eventSelectedID){
     })
   .then(response => response.json())
   .then(expenseCreatedDetails =>
-    // console.log(expenseCreatedDetails))
     replaceHTML())
-    // renderNewExpenseCreated(expenseCreatedDetails,eventSelectedID))
   .catch(error => console.log(error))
 }
 
@@ -414,6 +447,7 @@ $(() => {
   handleAddEventButton();
 
   $('body').on('change', 'input[type="range"]', function(e) {
-    handleSliderChange(e);
+listenSliderChange(e);
+    // handleSliderChange(e);
   })
 });
