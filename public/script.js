@@ -2,12 +2,13 @@
 let globalData = '';
 let selectedEvent = '';
 
-// APPENDS LIST OF EVENTS FROM DB TO PAGE
+//RENDERS EVENTS TO DOM
 function appendToDOM(){
   const eventsHTML = generateEventsHTML();
     $('main').html(eventsHTML);
 }
 
+//GENERATES EVENTS SECTION & CALLS FOR EACH EVENT TO BE DISPLAYED AS LI
 //DISPLAYS EVENTS (NAME CHANGE TO displayEvents?)
 function generateEventsHTML() {
   const eventItems = globalData.map(event => {
@@ -22,7 +23,7 @@ function generateEventsHTML() {
       </section>`;
 }
 
-//GENERATES EVENT ITEMS
+//GENERATES EACH EVENT AS A LIST ITEM
 function generateEventItemHTML(eventsData) {
   return `<li class="eventItem" id="${eventsData.title}" data-id="${eventsData._id}">
       <p>${eventsData.title}</p>
@@ -32,7 +33,7 @@ function generateEventItemHTML(eventsData) {
     </li>`;
 }
 
-//RENDER NEW EVENT ITEM AFTER POST TO API MADE (CHANGE NAME TO displayEventAdded)
+//RENDER NEW EVENT ITEM AFTER POST TO API MADE (CHANGE NAME TO displayEventAdded) --IS THIS EVEN USED?
 function renderNewEventCreated(updatedEventsData){
   $('.eventItemsList').append(`
     <li class="eventItem" id="${updatedEventsData.title}" data-id="${updatedEventsData._id}">
@@ -49,14 +50,12 @@ function renderNewEventCreated(updatedEventsData){
 function listenEventSelected(){
   $('main').on('click', 'li', function(e){
     let eventSelectedID = $(this).attr('data-id');
-    // I TOOK OFF 'LET' FROM HERE, SHOULD IT GO BACK?
-     selectedEvent = $(this).attr('id');
+    selectedEvent = $(this).attr('id');
     replaceHTML(selectedEvent,eventSelectedID);
-    // fetchGETExpense(selectedEvent, eventSelectedID);
   });
 }
 
-//DISPLAYS EVENT'S EXPENSE PAGE SHOULD IT REPLACE MAIN AND APPEND EACH SECTION TO THE MAIN SECTION?
+//RENDERS EVENT'S EXPENSE PAGE. CALLS FOR TOTBUDSECTION & EXPENSELIST SECTION.
 function replaceHTML(selectedEvent, eventSelectedID){
   let totalBudgetSection = generateTotBudSection(selectedEvent);
   let expenseList = generateExpenseSection(selectedEvent, eventSelectedID);
@@ -64,9 +63,11 @@ function replaceHTML(selectedEvent, eventSelectedID){
   $('main').append(totalBudgetSection);
   $('main').append(expenseList);
   handleAddExpenseButton(eventSelectedID);
-  handleSliderChange(selectedEvent);
+//----------------- NOTE CHANGE ---------------------
+  handleSliderChange({target: null}, eventSelectedID);
 }
 
+//GENERATES TOTAL BUDGET SECTION HTML
 function generateTotBudSection(selectedEvent){
   return `
     <section class="totBud">
@@ -78,60 +79,83 @@ function generateTotBudSection(selectedEvent){
     </section>`;
 }
 
-
+// HOLDS EXPENSE LIST SECTION HTML & CALLS FOR EACH EXPENSE TO BE SHOWN
 function generateExpenseSection(selectedEvent, eventSelectedID){
+// -------------------- NOTE CHANGE: renderExpenseItems2 IS NOW CALLED BEFORE THIS RETURNS TO REMOVE UNDEFINED/[OBJECT,OBJECT]----------------------
+  renderExpenseItems2(selectedEvent, eventSelectedID)
+
   return `
   <section class="expenses">
     <h3>Expenses</h3>
     <button class="addExpenseButton" id="addExpenseButton" type="button" value="+" role="button">Add Expense</button>
-    ${renderExpenseItems2(selectedEvent, eventSelectedID)}
   </section>`
 }
 
+//IS THIS EVEN CALLED FOR?
 function renderExpenseItems(eventSelectedID) {
   renderExpenseList();
-  // handleSliderChange();
   handleTotBudChange();
 }
 
 //HANDLES CHANGES TO SLIDER (AKA PERCENTAGE)
-function handleSliderChange(selectedEvent){
-  $('body').on('change','input[type="range"]', function(e) {
-    const name = $(this).closest('div').attr('id');
-    const val = $(this).val();
-    $(this).siblings('label').text(val+ '% of budget')
+//------- NOTE CHANGE: NOW CALLS FOR 'domEvent & event_id' ----------
+function handleSliderChange(domEvent, event_id){
+  // GET CURRENT SLIDER INFO
+  // domeEvent.target returns the element that triggered the event
+  let target = domEvent.target
+  console.log(target);
+  const nameOfExpense = $(target).closest('div').attr('id');
+  console.log(nameOfExpense);
+  const valOfSlider = $(target).val();
+  console.log(valOfSlider);
+
+  //SYNCING UP ALL PERCENTAGES
+  $(target).siblings('label').text(valOfSlider + '% of budget')
     // globalData.find(event => event._id === eventSelectedID).budget;
     // globalData.find(event => event.title === selectedEvent).expenses[name].percentage = val/100;
 
-let expItems = globalData.find(event => event.title === selectedEvent).expenses;
+  //CALCULATING NEW PERCENTAGE FOR EACH OF THE EXPENSES
+  if (!event_id)
+    event_id = $(target).parents('li').data('eventId');
+  let expItems = globalData.find(event => event._id === event_id).expenses;
+  let expPercentage = expItems.map(exp => {
+    return exp.percentage = valOfSlider / 100
+  });
 
-let expPercentage = expItems.map(exp => {exp.title == name
-  return exp.percentage = val/100;
-});
+  //VALIDATION SO PERCENTAGES DON'T SURPASS TOTAL OF 100
+  let remainingPercentage = 100 - valOfSlider;
 
-
-
-    let remainingPercentage = 100 - val;
+  // ITERATE OVER EACH SLIDER
     $('input[type="range"]').each(function(){
-      if($(this).closest('div').attr('id')!==name){
+
+      //IF ITS NOT THE SLIDER THAT WAS JUST CHANGED
+      if($(this).closest('div').attr('id')!==nameOfExpense){
+
+        //AND IF ITS GREATER THAN 100
         if($(this).val()>=remainingPercentage){
+
+          //CHANGE SO THAT THIS VALUE AND THE CHANGED ONE == 100
           $(this).val(remainingPercentage);
           remainingPercentage = 0;
-        } else {
+
+        } else
+
           remainingPercentage -= $(this).val();
-        }
+
         $(this).siblings('label').text($(this).val()+ '% of budget');
       }
     });
-    $(`#${name}-value`).text(calculateExpenseAmt(val/100));
-  })
+
+    $(`#${nameOfExpense}-value`).text(calculateExpenseAmt(valOfSlider / 100, event_id));
 }
 
 //CALCULATES EXPENSE AMOUNT BASED ON INPUTS AND CHANGES
-function calculateExpenseAmt(expense,percentVal,eventSelectedID){
+function calculateExpenseAmt(percentVal,eventSelectedID){
+  ids = globalData.map(function(event) {
+    return event._id
+  });
   let expenseBudget = globalData.find(event => event._id === eventSelectedID).budget;
-  console.log(expenseBudget);
-  let expenseTypeAmt = expenseBudget*percentVal;
+  let expenseTypeAmt = expenseBudget * (percentVal / 100);
   return Math.floor(expenseTypeAmt);
 }
 
@@ -145,7 +169,6 @@ function renderExpenseItems2(selectedEvent, eventSelectedID) {
 }
 
 function returnExpenseList(eachExpense){
-  //why can't it go on a dynamically created element?
   return $('body').append(`
     <ul class="expenseListSection">
       ${eachExpense}
@@ -164,12 +187,11 @@ function handleAddExpenseButton(eventSelectedID){
 // GENERATES/DISPLAYS EXPENSE DETAILS
 function generateExpenseItemDetails(expense, eventSelectedID) {
   let percentVal = expense.percentage;
-  console.log(expense);
   return `
     <li class="subCatItem">
       <p>${expense.title}</p>
       ${generateSlider(expense,percentVal)}
-      <p id="${expense.title}">\$${calculateExpenseAmt(expense,percentVal, eventSelectedID)}</p>
+      <p id="${expense.title}">\$${calculateExpenseAmt(percentVal, eventSelectedID)}</p>
     </li>`;
 }
 //
@@ -186,9 +208,9 @@ function generateExpenseItemDetails(expense, eventSelectedID) {
 
 // GENERATES SLIDER
 function generateSlider(expense,percentVal){
-  return `<div id="${expense.title}" class="slidecontainer">
+  return `<div id="${expense._id}" class="slidecontainer">
       <input type="range" name="slider" min="0" max="100" value="${percentVal*100}" class="slider" id="myRange">
-      <label for="slider">percent of budget</label>
+      <label for="slider">${percentVal}% of budget</label>
     </div>`;
 }
 
@@ -197,6 +219,7 @@ function handleTotBudChange(){
   $('input[type="number"]').on('change', function(e){
     const val = $(this).val();
     //make this accurate
+    //probably have to change selectedEVent here
     globalData.events = globalData.events.map(el => {
       if (el.title == selectedEvent){
         el.budget = val;
@@ -218,7 +241,7 @@ function handleAddEventButton(){
 
 //HANDLES SUBMIT EXPENSE BUTTON
 function handleExpenseSubmitButton(eventSelectedID){
-  //target that form and change t submit
+  //target that form and change to submit
   $('.expenseForm').on('submit', function(e){
     e.preventDefault(e);
     const newExpenseData = getNewExpenseInputVals(eventSelectedID);
@@ -294,7 +317,6 @@ function fetchGET(){
   .then(res => res.json())
   .then(newResponse => {
     globalData = newResponse;
-    console.log(globalData);
     appendToDOM();
   })
   .catch(error => console.log(error))
@@ -376,7 +398,13 @@ function expensePOSTRequest(newExpenseData,eventSelectedID){
 }
 
 //
-$(fetchGET());
-$(onDeleteEventItem());
-$(listenEventSelected());
-$(handleAddEventButton());
+$(() => {
+  fetchGET();
+  onDeleteEventItem();
+  listenEventSelected();
+  handleAddEventButton();
+
+  $('body').on('change', 'input[type="range"]', function(e) {
+    handleSliderChange(e);
+  })
+});

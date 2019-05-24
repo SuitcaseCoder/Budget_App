@@ -1,0 +1,198 @@
+diff --git a/public/script.js b/public/script.js
+index 57bd5df..42ab788 100644
+--- a/public/script.js
++++ b/public/script.js
+@@ -1,5 +1,5 @@
+ 
+-let globalData = '';
++window.globalData = '';
+ let selectedEvent = '';
+ 
+ // APPENDS LIST OF EVENTS FROM DB TO PAGE
+@@ -50,7 +50,7 @@ function listenEventSelected(){
+   $('main').on('click', 'li', function(e){
+     let eventSelectedID = $(this).attr('data-id');
+     // I TOOK OFF 'LET' FROM HERE, SHOULD IT GO BACK?
+-     selectedEvent = $(this).attr('id');
++    selectedEvent = $(this).attr('id');
+     replaceHTML(selectedEvent,eventSelectedID);
+     // fetchGETExpense(selectedEvent, eventSelectedID);
+   });
+@@ -64,7 +64,7 @@ function replaceHTML(selectedEvent, eventSelectedID){
+   $('main').append(totalBudgetSection);
+   $('main').append(expenseList);
+   handleAddExpenseButton(eventSelectedID);
+-  handleSliderChange(selectedEvent);
++  handleSliderChange({target: null}, eventSelectedID);
+ }
+ 
+ function generateTotBudSection(selectedEvent){
+@@ -80,11 +80,12 @@ function generateTotBudSection(selectedEvent){
+ 
+ 
+ function generateExpenseSection(selectedEvent, eventSelectedID){
++  renderExpenseItems2(selectedEvent, eventSelectedID)
++
+   return `
+   <section class="expenses">
+     <h3>Expenses</h3>
+     <button class="addExpenseButton" id="addExpenseButton" type="button" value="+" role="button">Add Expense</button>
+-    ${renderExpenseItems2(selectedEvent, eventSelectedID)}
+   </section>`
+ }
+ 
+@@ -95,43 +96,58 @@ function renderExpenseItems(eventSelectedID) {
+ }
+ 
+ //HANDLES CHANGES TO SLIDER (AKA PERCENTAGE)
+-function handleSliderChange(selectedEvent){
+-  $('body').on('change','input[type="range"]', function(e) {
+-    const name = $(this).closest('div').attr('id');
+-    const val = $(this).val();
+-    $(this).siblings('label').text(val+ '% of budget')
+-    // globalData.find(event => event._id === eventSelectedID).budget;
+-    // globalData.find(event => event.title === selectedEvent).expenses[name].percentage = val/100;
++function handleSliderChange(domEvent, event_id) {
++  // Get current slider information
++  let target = domEvent.target
++  const nameOfExpense = $(target).closest('div').attr('id');
++  const valOfSlider = $(target).val();
++
++  // Trying to sync up all percentages
++  $(target).siblings('label').text(valOfSlider + '% of budget')
++  // globalData.find(event => event._id === eventSelectedID).budget;
++  // globalData.find(event => event.title === selectedEvent).expenses[nameOfExpense].percentage = valOfSlider/100;
++
++  // Calculate new percentage for each expense
++  if (!event_id)
++    event_id = $(target).parents('li').data('eventId');
++  let expItems = globalData.find(event => event._id === event_id).expenses;
++  let expPercentage = expItems.map(exp => {
++    return exp.percentage = valOfSlider / 100
++  });
+ 
+-let expItems = globalData.find(event => event.title === selectedEvent).expenses;
++  // Validation so that percentages don't add up to more than 100
++  let remainingPercentage = 100 - valOfSlider;
++  // Iterate over every slider
++  $('input[type="range"]').each(function() {
+ 
+-let expPercentage = expItems.map(exp => {exp.title == name
+-  return exp.percentage = val/100;
+-});
++    // If not the slider that was just changed (breaks for duplicate expense title names)
++    if ($(this).closest('div').attr('id') !== nameOfExpense) {
+ 
++      // If greater than 100
++      if ($(this).val() >= remainingPercentage){
+ 
++        // Make sure this val + one that changed == 100
++        $(this).val(remainingPercentage);
++        remainingPercentage = 0;
+ 
+-    let remainingPercentage = 100 - val;
+-    $('input[type="range"]').each(function(){
+-      if($(this).closest('div').attr('id')!==name){
+-        if($(this).val()>=remainingPercentage){
+-          $(this).val(remainingPercentage);
+-          remainingPercentage = 0;
+-        } else {
+-          remainingPercentage -= $(this).val();
+-        }
+-        $(this).siblings('label').text($(this).val()+ '% of budget');
+-      }
+-    });
+-    $(`#${name}-value`).text(calculateExpenseAmt(val/100));
+-  })
++      } else
++        remainingPercentage -= $(this).val();
++
++      $(target).siblings('label').text($(target).val()+ '% of budget');
++    }
++  });
++
++
++  $(`#${nameOfExpense}-value`).text(calculateExpenseAmt(valOfSlider / 100, event_id));
+ }
+ 
+ //CALCULATES EXPENSE AMOUNT BASED ON INPUTS AND CHANGES
+-function calculateExpenseAmt(expense,percentVal,eventSelectedID){
++function calculateExpenseAmt(percentVal, eventSelectedID){
++  ids = globalData.map(function(event) {
++    return event._id
++  });
+   let expenseBudget = globalData.find(event => event._id === eventSelectedID).budget;
+-  console.log(expenseBudget);
+-  let expenseTypeAmt = expenseBudget*percentVal;
++  let expenseTypeAmt = expenseBudget * (percentVal / 100);
+   return Math.floor(expenseTypeAmt);
+ }
+ 
+@@ -164,12 +180,11 @@ function handleAddExpenseButton(eventSelectedID){
+ // GENERATES/DISPLAYS EXPENSE DETAILS
+ function generateExpenseItemDetails(expense, eventSelectedID) {
+   let percentVal = expense.percentage;
+-  console.log(expense);
+   return `
+-    <li class="subCatItem">
++    <li class="subCatItem" data-event-id="${eventSelectedID}">
+       <p>${expense.title}</p>
+       ${generateSlider(expense,percentVal)}
+-      <p id="${expense.title}">\$${calculateExpenseAmt(expense,percentVal, eventSelectedID)}</p>
++      <p id="${expense.title}">\$${calculateExpenseAmt(percentVal, eventSelectedID)}</p>
+     </li>`;
+ }
+ //
+@@ -186,9 +201,9 @@ function generateExpenseItemDetails(expense, eventSelectedID) {
+ 
+ // GENERATES SLIDER
+ function generateSlider(expense,percentVal){
+-  return `<div id="${expense.title}" class="slidecontainer">
++  return `<div id="${expense._id}" class="slidecontainer">
+       <input type="range" name="slider" min="0" max="100" value="${percentVal*100}" class="slider" id="myRange">
+-      <label for="slider">percent of budget</label>
++      <label for="slider">${percentVal}% of budget</label>
+     </div>`;
+ }
+ 
+@@ -294,7 +309,6 @@ function fetchGET(){
+   .then(res => res.json())
+   .then(newResponse => {
+     globalData = newResponse;
+-    console.log(globalData);
+     appendToDOM();
+   })
+   .catch(error => console.log(error))
+@@ -376,7 +390,13 @@ function expensePOSTRequest(newExpenseData,eventSelectedID){
+ }
+ 
+ //
+-$(fetchGET());
+-$(onDeleteEventItem());
+-$(listenEventSelected());
+-$(handleAddEventButton());
++$(() => {
++  fetchGET();
++  onDeleteEventItem();
++  listenEventSelected();
++  handleAddEventButton();
++
++  $('body').on('change','input[type="range"]', function(e) {
++    handleSliderChange(e);
++  })
++});
+diff --git a/server.js b/server.js
+index f3ba8ee..dfe5cb4 100644
+--- a/server.js
++++ b/server.js
+@@ -60,6 +60,10 @@ app.post('/events', jsonParser, (req, res) => {
+ 
+ });
+ 
++// Come back to this, have a show page for each event
++app.get('/event/:id', function() {
++})
++
+ //POST EXPENSES
+ 
+ app.post('/expenses', jsonParser, (req, res) => {
