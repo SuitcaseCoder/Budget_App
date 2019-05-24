@@ -60,6 +60,10 @@ app.post('/events', jsonParser, (req, res) => {
 
 });
 
+// Come back to this, have a show page for each event
+app.get('/event/:id', function() {
+})
+
 //POST EXPENSES
 
 app.post('/expenses', jsonParser, (req, res) => {
