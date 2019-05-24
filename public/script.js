@@ -69,10 +69,12 @@ function replaceHTML(selectedEvent, eventSelectedID){
 
 //GENERATES TOTAL BUDGET SECTION HTML
 function generateTotBudSection(selectedEvent){
+  let displayBudget = globalData.find(event => event.title === selectedEvent).budget;
+  console.log(displayBudget);
   return `
     <section class="totBud">
       <h2>${selectedEvent}</h2>
-      <h3>Visualize your budget for your upcoming ${selectedEvent}</h3>
+      <h3>Current Budget for ${selectedEvent}: $${displayBudget}</h3>
         <label for="totalBudget">What's your budget?:</label>
         <input type="number" id="totBudget" name="totalBudget"
               min="10">
@@ -118,12 +120,14 @@ function handleSliderChange(domEvent, event_id){
   if (!event_id)
     event_id = $(target).parents('li').data('eventId');
   let expItems = globalData.find(event => event._id === event_id).expenses;
+  console.log(expItems);
   let expPercentage = expItems.map(exp => {
     return exp.percentage = valOfSlider / 100
   });
 
   //VALIDATION SO PERCENTAGES DON'T SURPASS TOTAL OF 100
   let remainingPercentage = 100 - valOfSlider;
+  console.log(remainingPercentage);
 
   // ITERATE OVER EACH SLIDER
     $('input[type="range"]').each(function(){
@@ -146,16 +150,20 @@ function handleSliderChange(domEvent, event_id){
       }
     });
 
-    $(`#${nameOfExpense}-value`).text(calculateExpenseAmt(valOfSlider / 100, event_id));
+    console.log(valOfSlider);
+    $(`#${nameOfExpense}-value`).text(calculateExpenseAmt(valOfSlider / 100 , event_id));
 }
 
 //CALCULATES EXPENSE AMOUNT BASED ON INPUTS AND CHANGES
 function calculateExpenseAmt(percentVal,eventSelectedID){
+  console.log(percentVal);
   ids = globalData.map(function(event) {
     return event._id
   });
   let expenseBudget = globalData.find(event => event._id === eventSelectedID).budget;
+  console.log(expenseBudget);
   let expenseTypeAmt = expenseBudget * (percentVal / 100);
+  console.log(Math.floor(expenseTypeAmt));
   return Math.floor(expenseTypeAmt);
 }
 
@@ -208,8 +216,9 @@ function generateExpenseItemDetails(expense, eventSelectedID) {
 
 // GENERATES SLIDER
 function generateSlider(expense,percentVal){
+  console.log(percentVal);
   return `<div id="${expense._id}" class="slidecontainer">
-      <input type="range" name="slider" min="0" max="100" value="${percentVal*100}" class="slider" id="myRange">
+      <input type="range" name="slider" min="0" max="100" value="${percentVal}" class="slider" id="myRange">
       <label for="slider">${percentVal}% of budget</label>
     </div>`;
 }
