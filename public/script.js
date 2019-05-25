@@ -1,6 +1,7 @@
 
 let globalData = '';
 let selectedEvent = '';
+let eventSelectedID = '';
 
 //RENDERS EVENTS TO DOM
 function appendToDOM(){
@@ -49,7 +50,7 @@ function renderNewEventCreated(updatedEventsData){
 //LISTENS FOR EVENT SELECTED & CALLS FOR PAGE REPLACEMENT
 function listenEventSelected(){
   $('main').on('click', 'li', function(e){
-    let eventSelectedID = $(this).attr('data-id');
+    eventSelectedID = $(this).attr('data-id');
     selectedEvent = $(this).attr('id');
     replaceHTML(selectedEvent,eventSelectedID);
   });
@@ -75,10 +76,12 @@ function generateTotBudSection(selectedEvent){
     <section class="totBud">
       <h2>${selectedEvent}</h2>
       <h3>Current Budget for ${selectedEvent}: $${displayBudget}</h3>
-        <label for="totalBudget">What's your budget?:</label>
-        <input type="number" id="totBudget" name="totalBudget"
-              min="10">
+
     </section>`;
+
+    // <label for="totalBudget">What's your budget?:</label>
+    // <input type="number" id="totBudget" name="totalBudget"
+    //       min="10">
 }
 
 // HOLDS EXPENSE LIST SECTION HTML & CALLS FOR EACH EXPENSE TO BE SHOWN
@@ -228,7 +231,6 @@ function updateExpAmt(recalculatedAmt,target){
   //I think the above gave me the list element, so now how do I dive into the text of p that I want, when the id of p is one of these ${} & change the text by using .text(recalculatedAmt); at the end
   console.log(newExpAmt);
 
-
 }
 //IS THIS EVEN CALLED FOR?
 // function renderExpenseItems(eventSelectedID) {
@@ -236,7 +238,25 @@ function updateExpAmt(recalculatedAmt,target){
 //   handleTotBudChange();
 // }
 
+function underBudgetCheck(valOfSlider, nameOfExpense, target){
+  let remainingPercentage = 100 - valOfSlider;
 
+  //IF ITS NOT THE SLIDER THAT WAS JUST CHANGED
+  if($(this).closest('div').attr('id')!==nameOfExpense){
+
+    //AND IF ITS GREATER THAN 100
+    if($(this).val()>=remainingPercentage){
+
+      //POP A MESSAGE THAT SAYS , 'HEY, YOU'RE OVERBUDGET'
+      $(this).val(remainingPercentage);
+      remainingPercentage = 0;
+    }
+}
+      //OR
+     // If slider goes up, subtract evenly from all other sliders, if slider goes down, don't do anything to other sliders
+   // if($(this).closest('div').attr('id')!==nameOfExpense){
+   //   if(valOfSlider >= )
+}
 
 
 //HANDLES ADD EXPENSE BUTTON
@@ -385,6 +405,19 @@ function callAPIPOST(postRequestData){
   .catch(error => console.log(error))
 }
 
+// CALL TO API TO GET DB AFTER NEW EXPENSE HAS BEEN ADDED
+function fetchDBNewExpenses(eventSelectedID){
+  console.log(eventSelectedID);
+  fetch(`http://localhost:8080/events/${eventSelectedID}`)
+  .then(res => res.json())
+  .then(newResponse => {
+    console.log(newResponse)
+    // globalData = newResponse;
+    // replaceHTML();
+  })
+  .catch(error => console.log(error))
+}
+
 //DISPLAYS ADD EXPENSE FORM
 function generateAddExpenseForm(eventSelectedID){
   //html for event form ONLY
@@ -408,20 +441,20 @@ function generateAddExpenseForm(eventSelectedID){
 //DELETE EVENT
 function onDeleteEventItem(){
   $('main').on('click', '#eventDeleteButton', eventItem => {
+    console.log(eventItem)
     deleteEventRequest(eventItem);
-
   })
 }
 
 function deleteEventRequest(eventItem){
+  console.log(eventItem);
   //I NEED TO PASS THE ID OF THE EVENT I'M CLICKING TO DELETE THE EVENT I'M CLICKING ON
-  fetch('http://localhost:8080/events/:id', {
+  fetch(`http://localhost:8080/events/${eventItem}`, {
     method: 'DELETE',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(eventItem)
   })
   .then(res => res.json())
-  .then(res => console.log(res))
 }
 
 // POST REQUEST TO ADD NEW EXPENSE
@@ -435,7 +468,8 @@ function expensePOSTRequest(newExpenseData,eventSelectedID){
     })
   .then(response => response.json())
   .then(expenseCreatedDetails =>
-    replaceHTML())
+    fetchDBNewExpenses())
+    // replaceHTML())
   .catch(error => console.log(error))
 }
 

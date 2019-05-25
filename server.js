@@ -103,8 +103,9 @@ app.post('/expenses', jsonParser, (req, res) => {
 
 // app.get('/events/:id', (req,res) => {
 //   Event
-//     .findById(req.params.id)
-//     // .then(expense => res.json(expense.serialize()))
+//     .findById(req.params._id)
+//     .then(expense => res.json(expense.serialize()))
+//       // .then(populate('expenses'))
 //     //
 //     .then(expenses => {
 //       return res.json(expenses.serialize())
@@ -117,8 +118,7 @@ app.post('/expenses', jsonParser, (req, res) => {
 
 app.get('/events/:id', (req,res) => {
   Event
-    // .find()
-    .findById(req.params.id)
+    .findById(req.params._id)
     .populate('expenses')
     .exec()
     .then(expenses => {
@@ -134,9 +134,14 @@ app.get('/events/:id', (req,res) => {
 
 app.delete('/events/:id', (req, res) => {
   Event
-   .findByIdAndRemove(req.params.id)
-   .then(event => status(204).end())
-   .catch(err => res.status(500).json({message:'Internal server error'}));
+   .findOneAndDelete(req.params._id)
+   .then(event =>
+     res.status(204).end())
+   .catch(err =>
+     console.log(err)
+     // res.status(500).json({message:'Internal server error'})
+   );
+
 })
 
 // app.post('/expenses', jsonParser, (req, res) => {
