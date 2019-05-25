@@ -142,55 +142,6 @@ function returnExpenseList(eachExpense){
 `);
 }
 
-//HANDLES CHANGES TO SLIDER (AKA PERCENTAGE)
-//------- NOTE CHANGE: NOW CALLS FOR 'domEvent & event_id' ----------
-function handleSliderChange(domEvent, event_id){
-  // GET CURRENT SLIDER INFO
-  // domeEvent.target returns the element that triggered the event
-  let target = domEvent.target
-  const nameOfExpense = $(target).closest('div').attr('id');
-  const valOfSlider = $(target).val();
-  //SYNCING UP ALL PERCENTAGES
-  $(target).siblings('label').text(valOfSlider + '% of budget')
-  console.log(valOfSlider);
-
-  //CALCULATING NEW PERCENTAGE FOR EACH OF THE EXPENSES
-  if (!event_id)
-    event_id = $(target).parents('li').data('eventId');
-  let expItems = globalData.find(event => event._id === event_id).expenses;
-  let expPercentage = expItems.map(exp => {
-    // console.log(valOfSlider)
-    return exp.percentage = valOfSlider / 100
-  });
-
-  //VALIDATION SO PERCENTAGES DON'T SURPASS TOTAL OF 100
-  let remainingPercentage = 100 - valOfSlider;
-  // console.log(remainingPercentage);
-
-  // ITERATE OVER EACH SLIDER
-    $('input[type="range"]').each(function(){
-
-      //IF ITS NOT THE SLIDER THAT WAS JUST CHANGED
-      if($(this).closest('div').attr('id')!==nameOfExpense){
-
-        //AND IF ITS GREATER THAN 100
-        if($(this).val()>=remainingPercentage){
-
-          //CHANGE SO THAT THIS VALUE AND THE CHANGED ONE == 100
-          $(this).val(remainingPercentage);
-          remainingPercentage = 0;
-
-        } else
-
-          remainingPercentage -= $(this).val();
-
-        $(this).siblings('label').text($(this).val()+ '% of budget');
-      }
-    });
-
-    $(`#${nameOfExpense}-value`).text(calculateExpenseAmt(valOfSlider/100 , event_id));
-}
-
 function listenSliderChange(domEvent){
     // GET CURRENT SLIDER INFO
     let target = domEvent.target
@@ -199,11 +150,11 @@ function listenSliderChange(domEvent){
     const valOfSlider = $(target).val();
     updateSliderVal(valOfSlider,nameOfExpense);
     recalculateExpenseAmt(valOfSlider,target);
+    underBudgetCheck(valOfSlider, nameOfExpense, target);
 }
 
 //DISPLAYS THE SLIDER'S CHANGED VALUE ACCURATELY
 function updateSliderVal(valOfSlider, nameOfExpense){
-  console.log(valOfSlider);
   $('input[type="range"]').each(function(){
     // IF ITS THE SLIDER BEING CHANGED, UPDATE THE LABEL
     if($(this).closest('div').attr('id')==nameOfExpense){
@@ -213,19 +164,14 @@ function updateSliderVal(valOfSlider, nameOfExpense){
 }
 
 function recalculateExpenseAmt(valOfSlider,target){
-//THOUGHT: I COULD MAKE EVENTSELECTEDID/OBJEC_ID A GLOBAL VARIABLE LIKE SELECTED EVENT
+
   let currentEventBud = globalData.find(event => event.title === selectedEvent).budget;
   let recalculatedAmt = (currentEventBud * (valOfSlider / 100));
-  console.log(recalculatedAmt);
   return updateExpAmt(recalculatedAmt,target);
 }
 
 function updateExpAmt(recalculatedAmt,target){
-
-  const newExpAmt = $(target).parent().parent().children('p').last().text(recalculatedAmt);
-  //I think the above gave me the list element, so now how do I dive into the text of p that I want, when the id of p is one of these ${} & change the text by using .text(recalculatedAmt); at the end
-  console.log(newExpAmt);
-
+  const newExpAmt = $(target).parent().parent().children('p').last().text('$' + recalculatedAmt);
 }
 //IS THIS EVEN CALLED FOR?
 // function renderExpenseItems(eventSelectedID) {
@@ -236,17 +182,26 @@ function updateExpAmt(recalculatedAmt,target){
 function underBudgetCheck(valOfSlider, nameOfExpense, target){
   let remainingPercentage = 100 - valOfSlider;
 
+$('input[type="range"]').each(function(){
+
   //IF ITS NOT THE SLIDER THAT WAS JUST CHANGED
   if($(this).closest('div').attr('id')!==nameOfExpense){
 
     //AND IF ITS GREATER THAN 100
     if($(this).val()>=remainingPercentage){
 
-      //POP A MESSAGE THAT SAYS , 'HEY, YOU'RE OVERBUDGET'
+      //CHANGE SO THAT THIS VALUE AND THE CHANGED ONE == 100
       $(this).val(remainingPercentage);
       remainingPercentage = 0;
-    }
-}
+
+    } else{
+      // trying to update the expenseAmt (number under each slider) every time it moves
+      remainingPercentage -= $(this).val();
+      $(this).siblings('label').text($(this).val()+ '% of budget');
+      // updateExpAmt(($(this).val()), target);
+  }}
+});
+
       //OR
      // If slider goes up, subtract evenly from all other sliders, if slider goes down, don't do anything to other sliders
    // if($(this).closest('div').attr('id')!==nameOfExpense){
