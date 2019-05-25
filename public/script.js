@@ -216,18 +216,13 @@ function recalculateExpenseAmt(valOfSlider,target){
 //THOUGHT: I COULD MAKE EVENTSELECTEDID/OBJEC_ID A GLOBAL VARIABLE LIKE SELECTED EVENT
   let currentEventBud = globalData.find(event => event.title === selectedEvent).budget;
   let recalculatedAmt = (currentEventBud * (valOfSlider / 100));
+  console.log(recalculatedAmt);
   return updateExpAmt(recalculatedAmt,target);
 }
 
 function updateExpAmt(recalculatedAmt,target){
-  //THIS IS WHERE I'M STUCK. HERE'S WHAT I GOTTA DO:
 
-  // -- target/find the expense we're on
-  console.log(target);
-
-  //how do I dive OUT of the slider div and back into the li>p>text
-  // -- find the element that holds the 'expenseTypeAmt' & cahnge its text to 'recalculatedAmt'
-  const newExpAmt = $(target).parent().parent().closest('p').attr(`id="${selectedEvent}`);
+  const newExpAmt = $(target).parent().parent().children('p').last().text(recalculatedAmt);
   //I think the above gave me the list element, so now how do I dive into the text of p that I want, when the id of p is one of these ${} & change the text by using .text(recalculatedAmt); at the end
   console.log(newExpAmt);
 
