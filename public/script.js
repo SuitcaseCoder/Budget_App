@@ -2,6 +2,9 @@
 let globalData = '';
 let selectedEvent = '';
 let eventSelectedID = '';
+let remainingBudget = 0;
+let sumOfExpenses = '';
+
 
 //RENDERS EVENTS TO DOM
 function appendToDOM(){
@@ -76,8 +79,9 @@ function generateTotBudSection(selectedEvent){
     <section class="totBud">
       <h2>${selectedEvent}</h2>
       <h3>Current Budget for ${selectedEvent}: $${displayBudget}</h3>
-
+      <h3 id='remainingBudget'></h3>
     </section>`;
+
 
     // <label for="totalBudget">What's your budget?:</label>
     // <input type="number" id="totBudget" name="totalBudget"
@@ -88,10 +92,12 @@ function generateTotBudSection(selectedEvent){
 function generateExpenseSection(selectedEvent, eventSelectedID){
 // -------------------- NOTE CHANGE: renderExpenseItems2 IS NOW CALLED BEFORE THIS RETURNS TO REMOVE UNDEFINED/[OBJECT,OBJECT]----------------------
   renderExpenseItems2(selectedEvent, eventSelectedID)
-
+console.log(sumOfExpenses);
   return `
   <section class="expenses">
+  <div id="remainingBudger"></div>
     <h3>Expenses</h3>
+    <p>current expense total = ${sumOfExpenses} </p>
     <button class="addExpenseButton" id="addExpenseButton" type="button" value="+" role="button">Add Expense</button>
   </section>`
 }
@@ -101,7 +107,7 @@ function renderExpenseItems2(selectedEvent, eventSelectedID) {
   const expenseItems = globalData.find(event => event.title === selectedEvent).expenses;
   const eachExpense = expenseItems.map(expenseItem =>
     {return generateExpenseItemDetails(expenseItem, eventSelectedID)}).join('');
-
+calcRemainingBudget();
   return returnExpenseList(eachExpense);
 }
 
@@ -126,6 +132,7 @@ function generateSlider(expense,percentVal){
 
 //CALCULATES EXPENSE AMOUNT BASED ON INPUTS AND CHANGES
 function calculateExpenseAmt(percentVal,eventSelectedID){
+
   ids = globalData.map(function(event) {
     return event._id
   });
@@ -150,7 +157,39 @@ function listenSliderChange(domEvent){
     const valOfSlider = $(target).val();
     updateSliderVal(valOfSlider,nameOfExpense);
     recalculateExpenseAmt(valOfSlider,target);
-    underBudgetCheck(valOfSlider, nameOfExpense, target);
+    calcRemainingBudget();
+}
+
+function calcRemainingBudget(){
+let expensesTotal = [];
+
+  //for each expense
+  $('input[type="range"]').each(function(){
+
+    // let test = $(this).closest('input').attr('value', $(this).val());
+    //set all the percent values in an array
+    expensesTotal.push($(this).val());
+    console.log(expensesTotal);
+    // get the sum & reset the remainingbudget var to the current remaining Budget
+    // remainingBudget = 100 -
+    sumOfExpenses =
+    expensesTotal.reduce((a, b) => parseFloat(a) + parseFloat(b));
+    remainingBudget = 100 - sumOfExpenses;
+    console.log(remainingBudget);
+    console.log(sumOfExpenses);
+
+    if (remainingBudget <= 0){
+      //or if remainingBudget is greater than 100
+      alert('uh-oh, you just went past your budget. check your numbers');
+      return $('#remainingBudget').html("You are OVER budget, please re-adjust your expenses");
+
+    } else {
+      return $('#remainingBudget').html("You are still UNDER budget");
+    }
+    //IF ITS NOT THE SLIDER THAT WAS JUST CHANGED
+  })
+  // sum up the percentages
+   // and if it's over 100 then display "over budget"!
 }
 
 //DISPLAYS THE SLIDER'S CHANGED VALUE ACCURATELY
@@ -159,6 +198,7 @@ function updateSliderVal(valOfSlider, nameOfExpense){
     // IF ITS THE SLIDER BEING CHANGED, UPDATE THE LABEL
     if($(this).closest('div').attr('id')==nameOfExpense){
     $(this).siblings('label').text($(this).val()+ '% of budget');
+    $(this).closest('input').attr('value', $(this).val());
   }
 })
 }
@@ -179,34 +219,33 @@ function updateExpAmt(recalculatedAmt,target){
 //   handleTotBudChange();
 // }
 
-function underBudgetCheck(valOfSlider, nameOfExpense, target){
-  let remainingPercentage = 100 - valOfSlider;
-
-$('input[type="range"]').each(function(){
-
-  //IF ITS NOT THE SLIDER THAT WAS JUST CHANGED
-  if($(this).closest('div').attr('id')!==nameOfExpense){
-
-    //AND IF ITS GREATER THAN 100
-    if($(this).val()>=remainingPercentage){
-
-      //CHANGE SO THAT THIS VALUE AND THE CHANGED ONE == 100
-      $(this).val(remainingPercentage);
-      remainingPercentage = 0;
-
-    } else{
-      // trying to update the expenseAmt (number under each slider) every time it moves
-      remainingPercentage -= $(this).val();
-      $(this).siblings('label').text($(this).val()+ '% of budget');
-      // updateExpAmt(($(this).val()), target);
-  }}
-});
-
-      //OR
-     // If slider goes up, subtract evenly from all other sliders, if slider goes down, don't do anything to other sliders
-   // if($(this).closest('div').attr('id')!==nameOfExpense){
-   //   if(valOfSlider >= )
-}
+// function underBudgetCheck(valOfSlider, nameOfExpense, target){
+//   let remainingPercentage = 100 - valOfSlider;
+//
+// $('input[type="range"]').each(function(){
+//
+//   //IF ITS NOT THE SLIDER THAT WAS JUST CHANGED
+//   if($(this).closest('div').attr('id')!==nameOfExpense){
+//     // recalculateExpenseAmt($(this).attr('p').last(),target)
+//     //AND IF ITS GREATER THAN 100
+//     if($(this).val()>=remainingPercentage){
+//
+//       //CHANGE SO THAT THIS VALUE AND THE CHANGED ONE == 100
+//       $(this).val(remainingPercentage);
+//       remainingPercentage = 0;
+//
+//
+//     } else
+//       remainingPercentage -= $(this).val();
+//       $(this).siblings('label').text($(this).val()+ '% of budget');
+//   }
+// });
+//
+//       //OR
+//      // If slider goes up, subtract evenly from all other sliders, if slider goes down, don't do anything to other sliders
+//    // if($(this).closest('div').attr('id')!==nameOfExpense){
+//    //   if(valOfSlider >= )
+// }
 
 
 //HANDLES ADD EXPENSE BUTTON
