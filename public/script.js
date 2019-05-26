@@ -211,41 +211,12 @@ function recalculateExpenseAmt(valOfSlider,target){
 function updateExpAmt(recalculatedAmt,target){
   const newExpAmt = $(target).parent().parent().children('p').last().text('$' + recalculatedAmt);
   const heyThere = $(target).parent().parent().children('p').last().attr('data-id',recalculatedAmt);
-  console.log(heyThere);
 
 }
 //IS THIS EVEN CALLED FOR?
 // function renderExpenseItems(eventSelectedID) {
 //   renderExpenseList();
 //   handleTotBudChange();
-// }
-
-// function underBudgetCheck(valOfSlider, nameOfExpense, target){
-//   let remainingPercentage = 100 - valOfSlider;
-//
-// $('input[type="range"]').each(function(){
-//
-//   //IF ITS NOT THE SLIDER THAT WAS JUST CHANGED
-//   if($(this).closest('div').attr('id')!==nameOfExpense){
-//     // recalculateExpenseAmt($(this).attr('p').last(),target)
-//     //AND IF ITS GREATER THAN 100
-//     if($(this).val()>=remainingPercentage){
-//
-//       //CHANGE SO THAT THIS VALUE AND THE CHANGED ONE == 100
-//       $(this).val(remainingPercentage);
-//       remainingPercentage = 0;
-//
-//
-//     } else
-//       remainingPercentage -= $(this).val();
-//       $(this).siblings('label').text($(this).val()+ '% of budget');
-//   }
-// });
-//
-//       //OR
-//      // If slider goes up, subtract evenly from all other sliders, if slider goes down, don't do anything to other sliders
-//    // if($(this).closest('div').attr('id')!==nameOfExpense){
-//    //   if(valOfSlider >= )
 // }
 
 
@@ -259,16 +230,18 @@ function handleAddExpenseButton(eventSelectedID){
 
 
 //
-// function renderNewExpenseCreated(expenseCreatedDetails,eventSelectedID){
-// let newExpenses = (globalData.find(event => event._id === eventSelectedID).expenses)
-//   $('.expenseListSection').append(
-//   `
-//     <li class="subCatItem">
-//       <p>${newExpenses.title}</p>
-//       ${generateSlider(newExpenses)}
-//       <p id="${newExpenses.title}">\$${calculateExpenseAmt()}</p>
-//     </li>`);
-// }
+function renderNewExpenseCreated(expenseCreatedDetails,eventSelectedID){
+  console.log(expenseCreatedDetails);
+let newExpenses = (globalData.find(event => event._id === eventSelectedID).expenses)
+console.log(newExpenses);
+  $('.expenseListSection').append(
+  `
+    <li class="subCatItem">
+      <p>${newExpenses.title}</p>
+      ${generateSlider(newExpenses)}
+      <p id="${newExpenses.title}">\$${calculateExpenseAmt()}</p>
+    </li>`);
+}
 
 //HANDLES CHANGES TO THE TOTAL BUDGET
 function handleTotBudChange(){
@@ -428,23 +401,32 @@ function generateAddExpenseForm(eventSelectedID){
     `)
 }
 
+
 //DELETE EVENT
 function onDeleteEventItem(){
-  $('main').on('click', '#eventDeleteButton', eventItem => {
-    console.log(eventItem)
-    deleteEventRequest(eventItem);
+  $('main').on('click', '#eventDeleteButton', function(eventItem) {
+    eventItem.stopPropagation();
+    const deletedEventID = $(this).parent().attr('data-id')
+    console.log(deletedEventID);
+    deleteEventRequest(deletedEventID);
   })
 }
 
-function deleteEventRequest(eventItem){
-  console.log(eventItem);
-  //I NEED TO PASS THE ID OF THE EVENT I'M CLICKING TO DELETE THE EVENT I'M CLICKING ON
-  fetch(`http://localhost:8080/events/${eventItem}`, {
+function deleteEventRequest(deletedEventID){
+  console.log(deletedEventID);
+  fetch(`http://localhost:8080/events/${deletedEventID}`, {
     method: 'DELETE',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(eventItem)
+    body: JSON.stringify({ id: deletedEventID})
   })
-  .then(res => res.json())
+  .then(res => {
+    if (res.status == 204){
+      fetchGET();
+    }
+  }
+    )
+    .catch(console.log);
+    // res.json())
 }
 
 // POST REQUEST TO ADD NEW EXPENSE
@@ -456,10 +438,15 @@ function expensePOSTRequest(newExpenseData,eventSelectedID){
         'Content-Type': 'application/json'
       }
     })
-  .then(response => response.json())
+  .then(response =>{
+    return response.json();
+  })
+    // response.json())
   .then(expenseCreatedDetails =>
-    fetchDBNewExpenses())
+    // renderNewExpenseCreated(expenseCreatedDetails,eventSelectedID))
+    fetchDBNewExpenses(eventSelectedID))
     // replaceHTML())
+    // renderExpenseItems2(expenseCreatedDetails, eventSelectedID))
   .catch(error => console.log(error))
 }
 

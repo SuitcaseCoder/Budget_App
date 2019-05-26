@@ -80,20 +80,17 @@ app.post('/expenses', jsonParser, (req, res) => {
       percentage: req.body.percentage,
     })
     .then(expense => {
+      console.log('---------------------------')
+      console.log(expense);
+      console.log('---------------------------')
+
       //query event model
-      return Event.findByIdAndUpdate(req.body.event, {
+      Event.findByIdAndUpdate(req.body.event, {
         $push: {expenses:expense._id}
-      }).then( event => {
-        res.json(event)}
-      )
-      //find the specific event I need
-      //once I find that event
-      //then I add it to expenses
-    })
-    .then(
-      expense =>   res.status(201).json(expense)
-      // .json(obj)
-    )
+      }).then( _ => {
+        return res.status(201).json(expense)}
+      )}
+  )
     .catch(err => {
       console.log(err);
       res.status(500).json({message: 'Internal server error'});
@@ -101,20 +98,21 @@ app.post('/expenses', jsonParser, (req, res) => {
 
 });
 
-// app.get('/events/:id', (req,res) => {
-//   Event
-//     .findById(req.params._id)
-//     .then(expense => res.json(expense.serialize()))
-//       // .then(populate('expenses'))
-//     //
-//     .then(expenses => {
-//       return res.json(expenses.serialize())
-//     })
-//     .catch(err => {
-//       console.log(err);
-//       res.status(500).json({message: 'internal server error'});
-//     });
-// });
+app.get('/events/:id', (req,res) => {
+  Event
+    .findById(req.params.id)
+    .then(expense => res.json(expense))
+
+      // .then(populate('expenses'))
+    //
+    .then(expenses => {
+      console.log(res.json(expenses.serialize()))
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({message: 'internal server error'});
+    });
+});
 
 app.get('/events/:id', (req,res) => {
   Event
@@ -134,7 +132,7 @@ app.get('/events/:id', (req,res) => {
 
 app.delete('/events/:id', (req, res) => {
   Event
-   .findOneAndDelete(req.params._id)
+   .findByIdAndRemove(req.params.id)
    .then(event =>
      res.status(204).end())
    .catch(err =>
