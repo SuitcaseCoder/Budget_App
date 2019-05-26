@@ -3,7 +3,8 @@ let globalData = '';
 let selectedEvent = '';
 let eventSelectedID = '';
 let remainingBudget = 0;
-let sumOfExpenses = '';
+let sumOfExpenses = 0;
+let expenseBudget = 0;
 
 
 //RENDERS EVENTS TO DOM
@@ -92,12 +93,11 @@ function generateTotBudSection(selectedEvent){
 function generateExpenseSection(selectedEvent, eventSelectedID){
 // -------------------- NOTE CHANGE: renderExpenseItems2 IS NOW CALLED BEFORE THIS RETURNS TO REMOVE UNDEFINED/[OBJECT,OBJECT]----------------------
   renderExpenseItems2(selectedEvent, eventSelectedID)
-console.log(sumOfExpenses);
   return `
   <section class="expenses">
   <div id="remainingBudger"></div>
     <h3>Expenses</h3>
-    <p>current expense total = ${sumOfExpenses} </p>
+    <p id="currentSum"></p>
     <button class="addExpenseButton" id="addExpenseButton" type="button" value="+" role="button">Add Expense</button>
   </section>`
 }
@@ -107,7 +107,9 @@ function renderExpenseItems2(selectedEvent, eventSelectedID) {
   const expenseItems = globalData.find(event => event.title === selectedEvent).expenses;
   const eachExpense = expenseItems.map(expenseItem =>
     {return generateExpenseItemDetails(expenseItem, eventSelectedID)}).join('');
-calcRemainingBudget();
+    sumExpenses();
+    calcRemainingBudget();
+// sumOfExpenses =
   return returnExpenseList(eachExpense);
 }
 
@@ -118,7 +120,7 @@ function generateExpenseItemDetails(expense, eventSelectedID) {
     <li class="subCatItem">
       <p>${expense.title}</p>
       ${generateSlider(expense,percentVal)}
-      <p id="${expense.title}">\$${calculateExpenseAmt(percentVal, eventSelectedID)}</p>
+      <p id="${expense.title}" data-id="${calculateExpenseAmt(percentVal, eventSelectedID)}">\$${calculateExpenseAmt(percentVal, eventSelectedID)}</p>
     </li>`;
 }
 
@@ -136,7 +138,7 @@ function calculateExpenseAmt(percentVal,eventSelectedID){
   ids = globalData.map(function(event) {
     return event._id
   });
-  let expenseBudget = globalData.find(event => event._id === eventSelectedID).budget;
+  expenseBudget = globalData.find(event => event._id === eventSelectedID).budget;
   let expenseTypeAmt = expenseBudget * (percentVal / 100);
   return Math.floor(expenseTypeAmt);
 }
@@ -157,39 +159,35 @@ function listenSliderChange(domEvent){
     const valOfSlider = $(target).val();
     updateSliderVal(valOfSlider,nameOfExpense);
     recalculateExpenseAmt(valOfSlider,target);
+    sumExpenses();
     calcRemainingBudget();
 }
 
-function calcRemainingBudget(){
-let expensesTotal = [];
 
-  //for each expense
+
+function sumExpenses(){
+  let expensesTotal = [];
   $('input[type="range"]').each(function(){
-
-    // let test = $(this).closest('input').attr('value', $(this).val());
-    //set all the percent values in an array
-    expensesTotal.push($(this).val());
-    console.log(expensesTotal);
-    // get the sum & reset the remainingbudget var to the current remaining Budget
-    // remainingBudget = 100 -
+    expensesTotal.push($(this).parent().parent().children('p').last().attr('data-id'));
     sumOfExpenses =
     expensesTotal.reduce((a, b) => parseFloat(a) + parseFloat(b));
-    remainingBudget = 100 - sumOfExpenses;
-    console.log(remainingBudget);
-    console.log(sumOfExpenses);
+  })
+}
 
-    if (remainingBudget <= 0){
-      //or if remainingBudget is greater than 100
-      alert('uh-oh, you just went past your budget. check your numbers');
+function calcRemainingBudget(){
+  $('#currentSum').html(`current expense total is: $${sumOfExpenses}`);
+  // $('input[type="range"]').each(function(){
+
+    remainingBudget = expenseBudget - sumOfExpenses;
+
+    if (remainingBudget < 0 ){
+      alert(`uh-oh, you are past your budget`);
       return $('#remainingBudget').html("You are OVER budget, please re-adjust your expenses");
 
     } else {
       return $('#remainingBudget').html("You are still UNDER budget");
     }
-    //IF ITS NOT THE SLIDER THAT WAS JUST CHANGED
-  })
-  // sum up the percentages
-   // and if it's over 100 then display "over budget"!
+  // })
 }
 
 //DISPLAYS THE SLIDER'S CHANGED VALUE ACCURATELY
@@ -207,11 +205,14 @@ function recalculateExpenseAmt(valOfSlider,target){
 
   let currentEventBud = globalData.find(event => event.title === selectedEvent).budget;
   let recalculatedAmt = (currentEventBud * (valOfSlider / 100));
-  return updateExpAmt(recalculatedAmt,target);
+  return Math.floor(updateExpAmt(recalculatedAmt,target));
 }
 
 function updateExpAmt(recalculatedAmt,target){
   const newExpAmt = $(target).parent().parent().children('p').last().text('$' + recalculatedAmt);
+  const heyThere = $(target).parent().parent().children('p').last().attr('data-id',recalculatedAmt);
+  console.log(heyThere);
+
 }
 //IS THIS EVEN CALLED FOR?
 // function renderExpenseItems(eventSelectedID) {
