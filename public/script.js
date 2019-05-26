@@ -126,6 +126,7 @@ function generateExpenseItemDetails(expense, eventSelectedID) {
 
 // GENERATES SLIDER
 function generateSlider(expense,percentVal){
+  console.log(expense);
   return `<div id="${expense._id}" class="slidecontainer">
       <input type="range" name="slider" min="0" max="100" value="${percentVal}" class="slider" id="myRange">
       <label for="slider">${percentVal}% of budget</label>
@@ -232,14 +233,14 @@ function handleAddExpenseButton(eventSelectedID){
 //
 function renderNewExpenseCreated(expenseCreatedDetails,eventSelectedID){
   console.log(expenseCreatedDetails);
-let newExpenses = (globalData.find(event => event._id === eventSelectedID).expenses)
-console.log(newExpenses);
+let newExpenses = expenseCreatedDetails;
+console.log(newExpenses.percentage);
   $('.expenseListSection').append(
   `
     <li class="subCatItem">
       <p>${newExpenses.title}</p>
-      ${generateSlider(newExpenses)}
-      <p id="${newExpenses.title}">\$${calculateExpenseAmt()}</p>
+      ${generateSlider(newExpenses, newExpenses.percentage)}
+      <p id="${newExpenses.title}">\$${calculateExpenseAmt(newExpenses.percentage, eventSelectedID)}</p>
     </li>`);
 }
 
@@ -369,17 +370,17 @@ function callAPIPOST(postRequestData){
 }
 
 // CALL TO API TO GET DB AFTER NEW EXPENSE HAS BEEN ADDED
-function fetchDBNewExpenses(eventSelectedID){
-  console.log(eventSelectedID);
-  fetch(`http://localhost:8080/events/${eventSelectedID}`)
-  .then(res => res.json())
-  .then(newResponse => {
-    console.log(newResponse)
-    // globalData = newResponse;
-    // replaceHTML();
-  })
-  .catch(error => console.log(error))
-}
+// function fetchDBNewExpenses(eventSelectedID){
+//   console.log(eventSelectedID);
+//   fetch(`http://localhost:8080/events/${eventSelectedID}`)
+//   .then(res => res.json())
+//   .then(newResponse => {
+//     console.log(newResponse)
+//     // globalData = newResponse;
+//     // replaceHTML();
+//   })
+//   .catch(error => console.log(error))
+// }
 
 //DISPLAYS ADD EXPENSE FORM
 function generateAddExpenseForm(eventSelectedID){
@@ -443,8 +444,7 @@ function expensePOSTRequest(newExpenseData,eventSelectedID){
   })
     // response.json())
   .then(expenseCreatedDetails =>
-    // renderNewExpenseCreated(expenseCreatedDetails,eventSelectedID))
-    fetchDBNewExpenses(eventSelectedID))
+    renderNewExpenseCreated(expenseCreatedDetails,eventSelectedID))
     // replaceHTML())
     // renderExpenseItems2(expenseCreatedDetails, eventSelectedID))
   .catch(error => console.log(error))
