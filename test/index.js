@@ -38,6 +38,7 @@ describe('rootUrl', function(){
 });
 
 describe('Events', function(){
+
   describe('getEvents', function(){
 
     it('should work', function(){
@@ -50,7 +51,7 @@ describe('Events', function(){
       })
     });
 
-    it('should return list of events', function(){
+    it('GET should return list of events', function(){
       return chai.request(app)
       .get('/events')
       .then(function(res){
@@ -64,7 +65,37 @@ describe('Events', function(){
         });
       })
     });
-
   });
 
 });
+
+    describe('postEvents', function(){
+
+      it('should add event item on POST', function(){
+        return chai.request(app)
+        .post('/events')
+        .then(function(res){
+          //can have several expectations, but won't pass until they all pass
+          expect(res).to.have.status(400);
+          expect(res.body).to.be.a('object');
+          expect(res.body.id).to.not.equal(null);
+        });
+      });
+    });
+
+    describe('deleteEvents', function(){
+/////////////figure this out. why is line 93 returning undefined?? //////////////
+      it('should delete event item on DELETE', function(){
+        return chai.request(app)
+        .get('/events')
+        .then(function(res){
+          return chai.request(app)
+            .delete(`/events/${res.body[2].id}`);
+        })
+        .then(function(res){
+          expect(res).to.have.status(204);
+        });
+      });
+    });
+
+    // });
