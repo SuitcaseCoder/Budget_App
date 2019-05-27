@@ -170,8 +170,7 @@ app.delete('/events/:id', (req, res) => {
 // });
 
 let server;
-
-
+//runServer is expecting two parameters
 function runServer(port, databaseUrl){
   return new Promise( (resolve, reject) => {
     mongoose.set('debug', true);

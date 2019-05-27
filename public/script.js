@@ -182,7 +182,7 @@ function calcRemainingBudget(){
     remainingBudget = expenseBudget - sumOfExpenses;
 
     if (remainingBudget < 0 ){
-      alert(`uh-oh, you are past your budget`);
+      // alert(`uh-oh, you are past your budget`);
       return $('#remainingBudget').html("You are OVER budget, please re-adjust your expenses");
 
     } else {
