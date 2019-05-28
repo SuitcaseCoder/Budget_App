@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = 8080
+// const port = 8080
 const mongoose = require('mongoose');
 
 const {PORT, DATABASE_URL} = require('./config');
@@ -211,7 +211,7 @@ function closeServer() {
 }
 
 if (require.main === module) {
-  runServer(8080, DATABASE_URL).catch(err => console.error(err));
+  runServer(PORT, DATABASE_URL).catch(err => console.error(err));
 }
 
 module.exports = {runServer, closeServer, app}
