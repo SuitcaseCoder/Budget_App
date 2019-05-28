@@ -87,15 +87,28 @@ describe('Events', function(){
 /////////////figure this out. why is line 93 returning undefined?? //////////////
       it('should delete event item on DELETE', function(){
         return chai.request(app)
-        .get('/events')
-        .then(function(res){
-          return chai.request(app)
-            .delete(`/events/${res.body[2].id}`);
+        fetch(`http://localhost:8080/events`, {
+          method: 'GET',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ id: deletedEventID})
         })
-        .then(function(res){
-          expect(res).to.have.status(204);
+        .then(function(response){
+          console.log('testing body--------------------' + JSON.stringify(response.body))
+            post('/events')
+            .then(function(res){
+
+              return chai.request(app)
+                .delete(`/events/:id/${response.body[0].id}`);
+                console.log(res.body[0].id);
+                console.log(res.body[0]._id);
+            })
+            .then(function(res){
+              expect(res).to.have.status(204);
+            });
         });
       });
+
+
     });
 
     // });
