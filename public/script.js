@@ -82,16 +82,10 @@ function generateTotBudSection(selectedEvent){
       <h3>Current Budget for ${selectedEvent}: $${displayBudget}</h3>
       <h3 id='remainingBudget'></h3>
     </section>`;
-
-
-    // <label for="totalBudget">What's your budget?:</label>
-    // <input type="number" id="totBudget" name="totalBudget"
-    //       min="10">
 }
 
 // HOLDS EXPENSE LIST SECTION HTML & CALLS FOR EACH EXPENSE TO BE SHOWN
 function generateExpenseSection(selectedEvent, eventSelectedID){
-// -------------------- NOTE CHANGE: renderExpenseItems2 IS NOW CALLED BEFORE THIS RETURNS TO REMOVE UNDEFINED/[OBJECT,OBJECT]----------------------
   renderExpenseItems2(selectedEvent, eventSelectedID)
   return `
   <section class="expenses">
@@ -109,7 +103,6 @@ function renderExpenseItems2(selectedEvent, eventSelectedID) {
     {return generateExpenseItemDetails(expenseItem, eventSelectedID)}).join('');
     sumExpenses();
     calcRemainingBudget();
-// sumOfExpenses =
   return returnExpenseList(eachExpense);
 }
 
@@ -165,7 +158,6 @@ function listenSliderChange(domEvent){
 }
 
 
-
 function sumExpenses(){
   let expensesTotal = [];
   $('input[type="range"]').each(function(){
@@ -177,18 +169,15 @@ function sumExpenses(){
 
 function calcRemainingBudget(){
   $('#currentSum').html(`current expense total is: $${sumOfExpenses}`);
-  // $('input[type="range"]').each(function(){
 
     remainingBudget = expenseBudget - sumOfExpenses;
 
     if (remainingBudget < 0 ){
-      // alert(`uh-oh, you are past your budget`);
       return $('#remainingBudget').html("You are OVER budget, please re-adjust your expenses");
 
     } else {
       return $('#remainingBudget').html("You are still UNDER budget");
     }
-  // })
 }
 
 //DISPLAYS THE SLIDER'S CHANGED VALUE ACCURATELY
@@ -244,21 +233,22 @@ console.log(newExpenses.percentage);
     </li>`);
 }
 
-//HANDLES CHANGES TO THE TOTAL BUDGET
-function handleTotBudChange(){
-  $('input[type="number"]').on('change', function(e){
-    const val = $(this).val();
-    //make this accurate
-    //probably have to change selectedEVent here
-    globalData.events = globalData.events.map(el => {
-      if (el.title == selectedEvent){
-        el.budget = val;
-      }
-      return el;
-    });
-      renderExpenseItems2();
-  })
-}
+// //HANDLES CHANGES TO THE TOTAL BUDGET
+// function handleTotBudChange(){
+//   $('input[type="number"]').on('change', function(e){
+//     const val = $(this).val();
+//     //make this accurate
+//     //probably have to change selectedEVent here
+//     globalData.events = globalData.events.map(el => {
+//       if (el.title == selectedEvent){
+//         el.budget = val;
+//       }
+//       return el;
+//     });
+//       renderExpenseItems2();
+//   })
+// }
+
 
 // + BUTTONS
 
@@ -271,7 +261,6 @@ function handleAddEventButton(){
 
 //HANDLES SUBMIT EXPENSE BUTTON
 function handleExpenseSubmitButton(eventSelectedID){
-  //target that form and change to submit
   $('.expenseForm').on('submit', function(e){
     e.preventDefault(e);
     const newExpenseData = getNewExpenseInputVals(eventSelectedID);
@@ -296,7 +285,6 @@ function getNewExpenseInputVals(eventSelectedID){
 
 //DISPLAYS ADD EVENT FORM
 function generateAddEventForm(){
-  //html for event form ONLY
   $('main').append(`
     <div class="eventFormDiv">
       <form role="form" class="eventForm">
@@ -343,7 +331,7 @@ function getNewEventInputVals(){
 
 // CALL TO API TO GET ALL EVENTS
 function fetchGET(){
-  fetch('http://localhost:8080/events')
+  fetch('/events')
   .then(res => res.json())
   .then(newResponse => {
     globalData = newResponse;
@@ -354,7 +342,7 @@ function fetchGET(){
 
 // POST CALL TO ADD NEW EVENT TO DB
 function callAPIPOST(postRequestData){
-  fetch('http://localhost:8080/events', {
+  fetch('/events', {
       method: 'POST',
       body: JSON.stringify(postRequestData),
       headers: {
