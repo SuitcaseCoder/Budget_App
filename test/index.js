@@ -37,6 +37,23 @@ describe('rootUrl', function(){
 
 });
 
+/////-------------------------////
+describe('Expenses', function(){
+
+  it('create an expense item on POST', function(){
+    return chai.request(app)
+    .post('/expenses')
+    .then(function(res){
+      //can have several expectations, but won't pass until they all pass
+      expect(res).to.have.status(400);
+      expect(res.body).to.be.a('object');
+      expect(res.body.id).to.not.equal(null);
+    });
+  });
+});
+//////---------------------------------/////
+
+
 describe('Events', function(){
 
   describe('getEvents', function(){
@@ -93,7 +110,6 @@ describe('Events', function(){
           body: JSON.stringify({ id: deletedEventID})
         })
         .then(function(response){
-          console.log('testing body--------------------' + JSON.stringify(response.body))
             post('/events')
             .then(function(res){
 
