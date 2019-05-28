@@ -1,0 +1,59 @@
+
+
+ header {
+  background-color: #675682;
+  font-family: arial;
+  color: white;
+  padding: 15px 0px;
+  margin: 0px;
+}
+
+header h1, h2{
+  text-align: center;
+}
+
+header ol{
+  border: 0.5px dotted lightgrey;
+  margin: 0px 250px;
+  padding: 8px;
+  margin-bottom: 15px;
+  background-color: lightgrey;
+}
+
+header ol>h3{
+  text-align: center;
+  color: #5F0F4e;
+}
+
+
+header ol>li {
+  color: #5F0F4e;
+  padding: 5px;
+  margin: 12px;
+}
+
+main {
+  color: #675682;
+  background-color: white;
+  margin: 0px 45px;
+}
+
+.totBud{
+  margin: 0px;
+  margin-top: 10px;
+  text-align: center;
+  border: 1px dotted lightgrey;
+  padding: 25px;
+  background-color: lightgrey;
+}
+
+.expenseListSection{
+  margin: 0px 45px;
+  color: #675682;
+  background-color: white;
+}
+
+button{
+  color: white;
+  background-color: #67aECA
+}
