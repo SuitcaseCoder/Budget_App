@@ -403,7 +403,7 @@ function onDeleteEventItem(){
 
 function deleteEventRequest(deletedEventID){
   console.log(deletedEventID);
-  fetch(`http://localhost:8080/events/${deletedEventID}`, {
+  fetch(`/events/${deletedEventID}`, {
     method: 'DELETE',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({ id: deletedEventID})
@@ -420,7 +420,7 @@ function deleteEventRequest(deletedEventID){
 
 // POST REQUEST TO ADD NEW EXPENSE
 function expensePOSTRequest(newExpenseData,eventSelectedID){
-  fetch(`http://localhost:8080/expenses`, {
+  fetch(`/expenses`, {
       method: 'POST',
       body: JSON.stringify(newExpenseData),
       headers: {
