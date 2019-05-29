@@ -22,7 +22,7 @@ header ol{
   margin: 0px 250px;
   padding: 8px;
   margin-bottom: 15px;
-  background-color: lightgrey;
+  background-color: white;
 }
 
 header ol>h3{
@@ -35,6 +35,8 @@ header ol>li {
   color: #5F0F4e;
   padding: 5px;
   margin: 12px;
+  margin-left: 95px;
+  font-size: 16px;
 }
 
 main {
@@ -60,7 +62,7 @@ main {
 
 button{
   color: white;
-  background-color: #67aECA
+  background-color: #67aECA;
 }
 
 
@@ -73,8 +75,11 @@ button{
 
   header ol {
     margin: 0px;
-
   }
+
+  /* header ol>li {
+    margin: 5px;
+  } */
 
   header{
     padding: 3px;

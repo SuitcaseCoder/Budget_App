@@ -211,7 +211,7 @@ function updateExpAmt(recalculatedAmt,target){
 //IS THIS EVEN CALLED FOR?
 // function renderExpenseItems(eventSelectedID) {
 //   renderExpenseList();
-//   handleTotBudChange();
+  // handleTotBudChange();
 // }
 
 
@@ -238,7 +238,7 @@ console.log(newExpenses.percentage);
     </li>`);
 }
 
-// //HANDLES CHANGES TO THE TOTAL BUDGET
+//HANDLES CHANGES TO THE TOTAL BUDGET
 // function handleTotBudChange(){
 //   $('input[type="number"]').on('change', function(e){
 //     const val = $(this).val();
