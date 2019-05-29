@@ -62,3 +62,40 @@ button{
   color: white;
   background-color: #67aECA
 }
+
+
+@media (max-width: 600px) {
+  body {
+    max-width: 100%;
+    height: auto;
+    margin: 0px;
+  }
+
+  header ol {
+    margin: 0px;
+
+  }
+
+  header{
+    padding: 3px;
+    margin: 0px;
+
+  }
+
+  header h1{
+    font-size: 30px;
+  }
+
+  #intro * {
+    font-size: 18px;
+    /* padding:12px; */
+  }
+
+  .totBud * {
+    font-size: 18px;
+    padding: 10px;
+  }
+
+
+
+ }

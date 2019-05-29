@@ -62,6 +62,7 @@ function listenEventSelected(){
 
 //RENDERS EVENT'S EXPENSE PAGE. CALLS FOR TOTBUDSECTION & EXPENSELIST SECTION.
 function replaceHTML(selectedEvent, eventSelectedID){
+  $('#intro').css('display','none');
   let totalBudgetSection = generateTotBudSection(selectedEvent);
   let expenseList = generateExpenseSection(selectedEvent, eventSelectedID);
   $('main').html(``);
