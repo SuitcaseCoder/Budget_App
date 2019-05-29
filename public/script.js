@@ -173,9 +173,13 @@ function calcRemainingBudget(){
     remainingBudget = expenseBudget - sumOfExpenses;
 
     if (remainingBudget < 0 ){
+      $('#remainingBudget').css('color','#E52A6F');
+
       return $('#remainingBudget').html("You are OVER budget, please re-adjust your expenses");
 
     } else {
+      $(this).css('color','#5F0F4e')
+      $('#remainingBudget').css('color','#5F0F4e')
       return $('#remainingBudget').html("You are still UNDER budget");
     }
 }

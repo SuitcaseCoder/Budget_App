@@ -8,6 +8,11 @@
   margin: 0px;
 }
 
+header h1 {
+    font-family: 'poppins';
+    font-size: 93px;
+}
+
 header h1, h2{
   text-align: center;
 }
