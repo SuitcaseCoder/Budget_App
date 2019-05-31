@@ -30,9 +30,10 @@ function generateEventsHTML() {
 
 //GENERATES EACH EVENT AS A LIST ITEM
 function generateEventItemHTML(eventsData) {
+  var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
   return `<li class="eventItem" id="${eventsData.title}" data-id="${eventsData._id}">
       <p>${eventsData.title}</p>
-      <p>${eventsData.date}</p>
+      <p>${eventsData.date.toLocaleString('en-US', options)}</p>
       <p>Budget: $${eventsData.budget}</p>
       <button role="button" id="eventDeleteButton">delete Event</button>
     </li>`;
@@ -43,8 +44,9 @@ function renderNewEventCreated(updatedEventsData){
   $('.eventItemsList').append(`
     <li class="eventItem" id="${updatedEventsData.title}" data-id="${updatedEventsData._id}">
         <p>${updatedEventsData.title}</p>
-        <p>${updatedEventsData .date.toLocaleDateString()}</p>
+        <p>${updatedEventsData.date}</p>
         <p>Budget: $${updatedEventsData.budget}</p>
+        <button role="button" id="eventDeleteButton">delete Event</button>
       </li>
     `)
 }
@@ -169,7 +171,7 @@ function sumExpenses(){
 }
 
 function calcRemainingBudget(){
-  $('#currentSum').html(`current expense total is: $${sumOfExpenses}`);
+  $('#currentSum').html(`current expense total is: $${Math.floor(sumOfExpenses)}`);
 
     remainingBudget = expenseBudget - sumOfExpenses;
 
@@ -190,8 +192,9 @@ function updateSliderVal(valOfSlider, nameOfExpense){
   $('input[type="range"]').each(function(){
     // IF ITS THE SLIDER BEING CHANGED, UPDATE THE LABEL
     if($(this).closest('div').attr('id')==nameOfExpense){
-    $(this).siblings('label').text($(this).val()+ '% of budget');
-    $(this).closest('input').attr('value', $(this).val());
+      // return Math.floor(updateExpAmt(recalculatedAmt,target));
+    $(this).siblings('label').text(Math.floor($(this).val())+ '% of budget');
+    $(this).closest('input').attr('value', Math.floor($(this).val()));
   }
 })
 }
@@ -295,27 +298,34 @@ function generateAddEventForm(){
       <form role="form" class="eventForm">
         <div>
           <label for="eventTitle">Name your event:</label>
-          <input type="text"  id="eventTitle">
+          <input type="text" id="eventTitle" required="required">
         </div>
         <div>
           <label for="eventDate">Date of your event:</label>
-          <input type="date"  id="eventDate">
+          <input type="date" value="2017-06-01" id="eventDate">
         </div>
         <div>
           <label for="eventBudget">Budget for your event: $</label>
-          <input type="number"  id="eventBudget">
+          <input type="number" min="0" id="eventBudget">
         </div>
-        <input class="submitEventButton" id="submitNewEvent" type="submit" value="Submit Event" role="button">
+        <button class="submitEventButton" id="submitNewEvent" type="submit" value="Submit Event" role="button">Submit Event</button>
       </form>
     </div> `)
     onNewEventSubmit();
 }
+
+
+
+// function requireFields(){
+//   setAttribute("required","false")
+// }
 
 // HANDLES NEW EVENT BUTTON
 function onNewEventSubmit(){
   $('form').on('click', '#submitNewEvent', function(e){
     e.preventDefault(e);
     getNewEventInputVals();
+    $('form').remove();
   });
 }
 
@@ -387,7 +397,7 @@ function generateAddExpenseForm(eventSelectedID){
         </div>
         <div>
           <label for="expensePercentage">Expense Percentage:</label>
-          <input type="number"  id="expensePercentage">
+          <input type="number"  min="0" id="expensePercentage">
         </div>
         <input class="submitExpenseButton" id="submitNewExpense" type="submit" value="Submit Expense" role="button">
       </form>
@@ -443,9 +453,23 @@ function expensePOSTRequest(newExpenseData,eventSelectedID){
   .catch(error => console.log(error))
 }
 
+// back to start
+
+$('#addExpenseButton').on('click', function(e){
+  generateAddExpenseForm(eventSelectedID);
+  handleExpenseSubmitButton(eventSelectedID);
+})
+
+function backToHomepage(){
+  $('#backToHomepage').on('click',function(e){
+    fetchGET();
+  })
+}
+
 //
 $(() => {
   fetchGET();
+  backToHomepage();
   onDeleteEventItem();
   listenEventSelected();
   handleAddEventButton();

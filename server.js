@@ -38,7 +38,7 @@ app.post('/events', jsonParser, (req, res) => {
     const field = requiredFields[i];
     if (!(field in req.body)) {
       const message = `Missing \`${field}\` in request body`
-      console.error(message);
+      console.log(message);
       return res.status(400).send(message);
     }
   }
