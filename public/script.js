@@ -33,7 +33,12 @@ function generateEventItemHTML(eventsData) {
   var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
   return `<li class="eventItem" id="${eventsData.title}" data-id="${eventsData._id}">
       <p>${eventsData.title}</p>
-      <p>${eventsData.date.toLocaleString('en-US', options)}</p>
+      <p>${Date(eventsData.date).toLocaleString('en-US', {
+        timeZoneName: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      })}</p>
       <p>Budget: $${eventsData.budget}</p>
       <button role="button" id="eventDeleteButton">delete Event</button>
     </li>`;
@@ -273,6 +278,8 @@ function handleExpenseSubmitButton(eventSelectedID){
     e.preventDefault(e);
     const newExpenseData = getNewExpenseInputVals(eventSelectedID);
     expensePOSTRequest(newExpenseData, eventSelectedID);
+    $('.expenseForm').remove();
+
   })
 }
 
