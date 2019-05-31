@@ -43,7 +43,7 @@ function renderNewEventCreated(updatedEventsData){
   $('.eventItemsList').append(`
     <li class="eventItem" id="${updatedEventsData.title}" data-id="${updatedEventsData._id}">
         <p>${updatedEventsData.title}</p>
-        <p>${updatedEventsData .date}</p>
+        <p>${updatedEventsData .date.toLocaleDateString()}</p>
         <p>Budget: $${updatedEventsData.budget}</p>
       </li>
     `)
