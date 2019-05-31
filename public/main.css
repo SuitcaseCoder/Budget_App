@@ -1,4 +1,7 @@
-
+body{
+  margin: 0px;
+  padding: 0px;
+}
 
  header {
   background-color: #675682;
@@ -11,6 +14,7 @@
 header h1 {
     font-family: 'poppins';
     font-size: 93px;
+    padding: 0px;
 }
 
 header h1, h2{
@@ -43,6 +47,15 @@ main {
   color: #675682;
   background-color: white;
   margin: 0px 45px;
+  margin-left: 40px;
+}
+
+.events {
+  margin-left: 200px;
+}
+
+.expenses * {
+  margin-left: 200px;
 }
 
 .totBud{
@@ -54,10 +67,35 @@ main {
   background-color: lightgrey;
 }
 
+.eventForm {
+  padding: 20px;
+  border: 2px dotted lightgrey;
+  margin-bottom: 5px;
+}
+
+.eventForm>div {
+  padding: 8px;
+}
+
+.expenseForm{
+    padding: 20px;
+    margin-left: 200px;
+    border: 2px dotted lightgrey;
+}
+
+.expenseForm>div {
+  padding: 8px;
+}
+
 .expenseListSection{
-  margin: 0px 45px;
+  /* margin: 0px 45px; */
   color: #675682;
   background-color: white;
+
+}
+
+.subCatItem {
+  margin-left: 200px;
 }
 
 button{
@@ -84,11 +122,11 @@ button{
   header{
     padding: 3px;
     margin: 0px;
-
   }
 
   header h1{
     font-size: 30px;
+    margin: 0px;
   }
 
   #intro * {

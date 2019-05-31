@@ -300,7 +300,7 @@ function getNewExpenseInputVals(eventSelectedID){
 
 //DISPLAYS ADD EVENT FORM
 function generateAddEventForm(){
-  $('main').append(`
+  $(`
     <div class="eventFormDiv">
       <form role="form" class="eventForm">
         <div>
@@ -317,7 +317,7 @@ function generateAddEventForm(){
         </div>
         <button class="submitEventButton" id="submitNewEvent" type="submit" value="Submit Event" role="button">Submit Event</button>
       </form>
-    </div> `)
+    </div> `).insertBefore('.addEventButton');
     onNewEventSubmit();
 }
 
