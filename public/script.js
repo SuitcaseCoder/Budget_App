@@ -142,7 +142,7 @@ function calculateExpenseAmt(percentVal,eventSelectedID){
   });
   expenseBudget = globalData.find(event => event._id === eventSelectedID).budget;
   let expenseTypeAmt = expenseBudget * (percentVal / 100);
-  return Math.floor(expenseTypeAmt);
+  return Math.floor(expenseTypeAmt).toFixed(2);
 }
 
 function returnExpenseList(eachExpense){
@@ -176,7 +176,7 @@ function sumExpenses(){
 }
 
 function calcRemainingBudget(){
-  $('#currentSum').html(`current expense total is: $${Math.floor(sumOfExpenses)}`);
+  $('#currentSum').html(`current expense total is: $${sumOfExpenses.toFixed(2)}`);
 
     remainingBudget = expenseBudget - sumOfExpenses;
 
@@ -208,11 +208,12 @@ function recalculateExpenseAmt(valOfSlider,target){
 
   let currentEventBud = globalData.find(event => event.title === selectedEvent).budget;
   let recalculatedAmt = (currentEventBud * (valOfSlider / 100));
-  return Math.floor(updateExpAmt(recalculatedAmt,target));
+  return updateExpAmt(recalculatedAmt,target);
 }
 
 function updateExpAmt(recalculatedAmt,target){
-  const newExpAmt = $(target).parent().parent().children('p').last().text('$' + recalculatedAmt);
+  console.log(recalculatedAmt.toFixed(2));
+  const newExpAmt = $(target).parent().parent().children('p').last().text('$' + recalculatedAmt.toFixed(2));
   const heyThere = $(target).parent().parent().children('p').last().attr('data-id',recalculatedAmt);
 
 }
@@ -309,7 +310,7 @@ function generateAddEventForm(){
         </div>
         <div>
           <label for="eventDate">Date of your event:</label>
-          <input type="date" value="2017-06-01" id="eventDate">
+          <input type="date" value="10-18-2020" id="eventDate">
         </div>
         <div>
           <label for="eventBudget">Budget for your event: $</label>
