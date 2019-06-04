@@ -14,7 +14,6 @@ function appendToDOM(){
 }
 
 //GENERATES EVENTS SECTION & CALLS FOR EACH EVENT TO BE DISPLAYED AS LI
-//DISPLAYS EVENTS (NAME CHANGE TO displayEvents?)
 function generateEventsHTML() {
   const eventItems = globalData.map(event => {
     return generateEventItemHTML(event);
@@ -44,7 +43,7 @@ function generateEventItemHTML(eventsData) {
     </li>`;
 }
 
-//RENDER NEW EVENT ITEM AFTER POST TO API MADE (CHANGE NAME TO displayEventAdded) --IS THIS EVEN USED?
+//RENDER NEW EVENT ITEM AFTER POST TO API MADE
 function renderNewEventCreated(updatedEventsData){
   $('.eventItemsList').append(`
     <li class="eventItem" id="${updatedEventsData.title}" data-id="${updatedEventsData._id}">
@@ -76,9 +75,7 @@ function replaceHTML(selectedEvent, eventSelectedID){
   $('main').append(totalBudgetSection);
   $('main').append(expenseList);
   handleAddExpenseButton(eventSelectedID);
-//----------------- NOTE CHANGE ---------------------
-listenSliderChange({target: null});
-  // handleSliderChange({target: null}, eventSelectedID);
+  listenSliderChange({target: null});
 }
 
 //GENERATES TOTAL BUDGET SECTION HTML
@@ -197,7 +194,6 @@ function updateSliderVal(valOfSlider, nameOfExpense){
   $('input[type="range"]').each(function(){
     // IF ITS THE SLIDER BEING CHANGED, UPDATE THE LABEL
     if($(this).closest('div').attr('id')==nameOfExpense){
-      // return Math.floor(updateExpAmt(recalculatedAmt,target));
     $(this).siblings('label').text(Math.floor($(this).val())+ '% of budget');
     $(this).closest('input').attr('value', Math.floor($(this).val()));
   }
@@ -215,14 +211,7 @@ function updateExpAmt(recalculatedAmt,target){
   console.log(recalculatedAmt.toFixed(2));
   const newExpAmt = $(target).parent().parent().children('p').last().text('$' + recalculatedAmt.toFixed(2));
   const heyThere = $(target).parent().parent().children('p').last().attr('data-id',recalculatedAmt);
-
 }
-//IS THIS EVEN CALLED FOR?
-// function renderExpenseItems(eventSelectedID) {
-//   renderExpenseList();
-  // handleTotBudChange();
-// }
-
 
 //HANDLES ADD EXPENSE BUTTON
 function handleAddExpenseButton(eventSelectedID){
@@ -233,11 +222,8 @@ function handleAddExpenseButton(eventSelectedID){
 }
 
 
-//
 function renderNewExpenseCreated(expenseCreatedDetails,eventSelectedID){
-  console.log(expenseCreatedDetails);
-let newExpenses = expenseCreatedDetails;
-console.log(newExpenses.percentage);
+  let newExpenses = expenseCreatedDetails;
   $('.expenseListSection').append(
   `
     <li class="subCatItem">
@@ -246,23 +232,6 @@ console.log(newExpenses.percentage);
       <p id="${newExpenses.title}">\$${calculateExpenseAmt(newExpenses.percentage, eventSelectedID)}</p>
     </li>`);
 }
-
-//HANDLES CHANGES TO THE TOTAL BUDGET
-// function handleTotBudChange(){
-//   $('input[type="number"]').on('change', function(e){
-//     const val = $(this).val();
-//     //make this accurate
-//     //probably have to change selectedEVent here
-//     globalData.events = globalData.events.map(el => {
-//       if (el.title == selectedEvent){
-//         el.budget = val;
-//       }
-//       return el;
-//     });
-//       renderExpenseItems2();
-//   })
-// }
-
 
 // + BUTTONS
 
@@ -322,12 +291,6 @@ function generateAddEventForm(){
     onNewEventSubmit();
 }
 
-
-
-// function requireFields(){
-//   setAttribute("required","false")
-// }
-
 // HANDLES NEW EVENT BUTTON
 function onNewEventSubmit(){
   $('form').on('click', '#submitNewEvent', function(e){
@@ -379,19 +342,6 @@ function callAPIPOST(postRequestData){
   )
   .catch(error => console.log(error))
 }
-
-// CALL TO API TO GET DB AFTER NEW EXPENSE HAS BEEN ADDED
-// function fetchDBNewExpenses(eventSelectedID){
-//   console.log(eventSelectedID);
-//   fetch(`http://localhost:8080/events/${eventSelectedID}`)
-//   .then(res => res.json())
-//   .then(newResponse => {
-//     console.log(newResponse)
-//     // globalData = newResponse;
-//     // replaceHTML();
-//   })
-//   .catch(error => console.log(error))
-// }
 
 //DISPLAYS ADD EXPENSE FORM
 function generateAddExpenseForm(eventSelectedID){
@@ -453,15 +403,11 @@ function expensePOSTRequest(newExpenseData,eventSelectedID){
   .then(response =>{
     return response.json();
   })
-    // response.json())
   .then(expenseCreatedDetails =>
     renderNewExpenseCreated(expenseCreatedDetails,eventSelectedID))
-    // replaceHTML())
-    // renderExpenseItems2(expenseCreatedDetails, eventSelectedID))
   .catch(error => console.log(error))
 }
 
-// back to start
 
 $('#addExpenseButton').on('click', function(e){
   generateAddExpenseForm(eventSelectedID);

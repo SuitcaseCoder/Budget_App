@@ -1,12 +1,10 @@
 'use strict';
 const express = require('express');
 const app = express();
-// const port = 8080
 const mongoose = require('mongoose');
 
 const {PORT, DATABASE_URL} = require('./config');
 const {Event, Expense} = require('./models');
-// const {Expense} = require('./models');
 
 const bodyParser = require('body-parser');
 
@@ -138,40 +136,13 @@ app.delete('/events/:id', (req, res) => {
      res.status(204).end())
    .catch(err =>
      console.log(err)
-     // res.status(500).json({message:'Internal server error'})
+     res.status(500).json({message:'Internal server error'})
    );
 
 })
 
-// app.post('/expenses', jsonParser, (req, res) => {
-//   // ensure `name` and `budget` are in request body
-//   const requiredFields = ['title', 'percentage'];
-//   for (let i=0; i<requiredFields.length; i++) {
-//     const field = requiredFields[i];
-//     if (!(field in req.body)) {
-//       const message = `Missing \`${field}\` in request body`
-//       console.error(message);
-//       return res.status(400).send(message);
-//     }
-//   }
-//
-//   Expense
-//     .create({
-//       title: req.body.title,
-//       percentage: req.body.percentage
-//     })
-//     .then(
-//       event => res.status(201).json(event)
-//     )
-//     .catch(err => {
-//       console.log(err);
-//       res.status(500).json({message: 'Internal Server Error'});
-//     });
-//
-// });
 
 let server;
-//runServer is expecting two parameters
 function runServer(port, databaseUrl){
   return new Promise( (resolve, reject) => {
     mongoose.set('debug', true);
@@ -203,7 +174,6 @@ function closeServer() {
     server.close(err => {
       if (err) {
         reject(err);
-        // so we don't also call `resolve()`
         return;
       }
       resolve();
