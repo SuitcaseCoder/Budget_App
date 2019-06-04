@@ -1,4 +1,4 @@
-# Budget_App
+# BudgIt
 https://budg-it.herokuapp.com/
 
 
