@@ -420,7 +420,7 @@ function backToHomepage(){
   })
 }
 
-//
+
 $(() => {
   fetchGET();
   backToHomepage();
