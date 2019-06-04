@@ -20,7 +20,7 @@ function generateEventsHTML() {
   }).join('');
   return `<section class='events'>
         <h3>Events</h3>
-        <input class="addEventButton" id="addEventButton" type="button" value="+" role="button">Add Event</input>
+        <button class="addEventButton" id="addEventButton" type="button" value="+" role="button">Add Event</button>
         <ul class="eventItemsList">
         ${eventItems}
         </ul>

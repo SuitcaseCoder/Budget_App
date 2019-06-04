@@ -135,9 +135,9 @@ app.delete('/events/:id', (req, res) => {
    .then(event =>
      res.status(204).end())
    .catch(err =>
-     console.log(err)
+     console.log(err))
      res.status(500).json({message:'Internal server error'})
-   );
+   ;
 
 })
 

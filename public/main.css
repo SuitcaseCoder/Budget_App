@@ -139,6 +139,19 @@ button{
     padding: 10px;
   }
 
+  .events {
+    margin: 0px;
+  }
 
+  .expenses * {
+    margin: 0px;
+  }
 
+  .expenseForm {
+    margin: 0px;
+  }
+
+  .subCatItem {
+    margin: 0px;
+  }
  }
