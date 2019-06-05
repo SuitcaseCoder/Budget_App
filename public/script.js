@@ -430,6 +430,8 @@ $(() => {
 
   $('body').on('change', 'input[type="range"]', function(e) {
 listenSliderChange(e);
+// onDeleteEventItem();
+
     // handleSliderChange(e);
   })
 });
