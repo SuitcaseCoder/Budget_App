@@ -47,7 +47,7 @@ function generateEventItemHTML(eventsData) {
 function renderNewEventCreated(updatedEventsData){
   $('.eventItemsList').append(`
     <li class="eventItem" id="${updatedEventsData.title}" data-id="${updatedEventsData._id}">
-        <p>${updatedEventsData.title}</p>
+        <p id="beforeEmoji">${updatedEventsData.title}</p>
         <p>${updatedEventsData.date}</p>
         <p>Budget: $${updatedEventsData.budget}</p>
         <button role="button" id="eventDeleteButton">delete Event</button>
@@ -85,6 +85,7 @@ function generateTotBudSection(selectedEvent){
     <section class="totBud">
       <h2>${selectedEvent}</h2>
       <h3>Current Budget for ${selectedEvent}: $${displayBudget}</h3>
+      <h3 id="currentSum"></h3>
       <h3 id='remainingBudget'></h3>
     </section>`;
 }
@@ -96,7 +97,6 @@ function generateExpenseSection(selectedEvent, eventSelectedID){
   <section class="expenses">
   <div id="remainingBudger"></div>
     <h3>Expenses</h3>
-    <p id="currentSum"></p>
     <button class="addExpenseButton" id="addExpenseButton" type="button" value="+" role="button">Add Expense</button>
   </section>`
 }
@@ -239,6 +239,7 @@ function renderNewExpenseCreated(expenseCreatedDetails,eventSelectedID){
 function handleAddEventButton(){
   $('body').on('click', '#addEventButton', function(e){
     generateAddEventForm();
+    $('#addEventButton').hide();
   })
 }
 

@@ -8,7 +8,7 @@ body{
   background-color: rgba(103,86,130,0.99);
   font-family: arial;
   color: white;
-  padding: 15px 0px;
+  padding: 10px 0px;
   margin: 0px;
 }
 
@@ -16,10 +16,16 @@ header h1 {
     font-family: 'poppins';
     font-size: 93px;
     padding: 0px;
+    text-shadow: #5F0F4e 2px -4px 8px;
+
 }
 
 header h1, h2{
   text-align: center;
+}
+
+#intro h2 {
+  text-shadow: #5F0F4e 2px -3px 2px;
 }
 
 header ol{
@@ -40,31 +46,43 @@ header ol>li {
   color: #5F0F4e;
   padding: 5px;
   margin: 12px;
-  margin-left: 95px;
+  /* margin-left: 95px; */
   font-size: 16px;
   list-style-type: none;
 }
 
 header ol>li:before{
   content: '\1F4B0';
-  margin-left: -15px;
+  /* margin-left: -15px; */
   margin-right: 8px;
 }
 
 main {
   color: #675682;
   background-color: white;
-  margin: 0px 45px;
-  margin-left: 40px;
+  display: block;
+  /* margin: 0px 45px; */
 }
 
-.events {
-  margin-left: 200px;
+.expenseListSection{
+  color: #675682;
+  background-color: white;
+  text-align: center;
+  display: block;
+  margin: 50px;
 }
 
-.expenses * {
-  margin-left: 200px;
+/* .events {
+  border: 1px black solid;
+ margin: 0 auto;
+} */
+
+ h3 {
+  font-family: 'poppins';
+  font-size: 35px;
+  text-shadow: lightgrey 1px -3px 3px;
 }
+
 
 .totBud{
   margin: 0px;
@@ -78,11 +96,34 @@ main {
 .eventForm {
   padding: 20px;
   border: 2px dotted lightgrey;
-  margin-bottom: 5px;
+  margin: 45px 0px 5px 0px;
 }
 
 .eventForm>div {
   padding: 8px;
+}
+
+.events {
+  border: 1px black solid;
+  margin: 0 auto;
+}
+
+.eventItemsList{
+  border: 1px red solid;
+  width: 45%;
+  margin: 0 auto;
+}
+
+.events>h3{
+  border: 1px red solid;
+  width: 45%;
+  margin: 0 auto;
+}
+
+.events>button{
+  border: 1px red solid;
+  width: 25%;
+  margin: 0 auto;
 }
 
 ul>li{
@@ -97,7 +138,7 @@ ul>li{
 
 .expenseForm{
     padding: 20px;
-    margin-left: 200px;
+    /* margin-left: 200px; */
     border: 2px dotted lightgrey;
 }
 
@@ -109,12 +150,12 @@ ul>li{
   /* margin: 0px 45px; */
   color: #675682;
   background-color: white;
-
 }
 
 .subCatItem {
-  margin-left: 200px;
+  /* margin-left: 200px; */
   list-style-type: none;
+  text-align: left;
 }
 
 #expenseEmoji::before{
@@ -125,12 +166,36 @@ ul>li{
 
 button{
   color: white;
-  background-color: #67aECA;
-  padding: 10px;
-  font-size: 14px;
-  font-weight: 400;
+  background-color: #675682;
 }
 
+#addEventButton{
+  /* margin: 25px 0px 10px 0px; */
+  padding: 20px;
+  font-size: 24px;
+  border-radius: 8px;
+}
+
+#eventDeleteButton {
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 8px;
+
+}
+
+#addExpenseButton {
+  padding: 20px;
+  font-size: 24px;
+  border-radius: 8px;
+}
+
+#submitNewEvent , #submitNewExpense {
+  color: white;
+  background-color: #675682;
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 8px;
+}
 
 @media (max-width: 600px) {
   body {
@@ -167,16 +232,12 @@ button{
     padding: 10px;
   }
 
-  .events {
-    margin: 0px;
-  }
-
   .expenses * {
     margin: 0px;
   }
 
   .expenseForm {
-    margin: 0px;
+    margin: 10px;
   }
 
   .subCatItem {
