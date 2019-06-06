@@ -4,7 +4,8 @@ body{
 }
 
  header {
-  background-color: #675682;
+  background-image: url('https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80');
+  background-color: rgba(103,86,130,0.99);
   font-family: arial;
   color: white;
   padding: 15px 0px;
@@ -41,6 +42,13 @@ header ol>li {
   margin: 12px;
   margin-left: 95px;
   font-size: 16px;
+  list-style-type: none;
+}
+
+header ol>li:before{
+  content: '\1F4B0';
+  margin-left: -15px;
+  margin-right: 8px;
 }
 
 main {
@@ -77,6 +85,16 @@ main {
   padding: 8px;
 }
 
+ul>li{
+  list-style-type: none;
+}
+
+#beforeEmoji::before{
+  content: '\1F389';
+  margin-left: -30px;
+  margin-right: 10px;
+}
+
 .expenseForm{
     padding: 20px;
     margin-left: 200px;
@@ -96,11 +114,21 @@ main {
 
 .subCatItem {
   margin-left: 200px;
+  list-style-type: none;
+}
+
+#expenseEmoji::before{
+  content: '\1F4B8';
+  margin-left: -30px;
+  margin-right: 10px;
 }
 
 button{
   color: white;
   background-color: #67aECA;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 400;
 }
 
 

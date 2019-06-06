@@ -31,7 +31,7 @@ function generateEventsHTML() {
 function generateEventItemHTML(eventsData) {
   var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
   return `<li class="eventItem" id="${eventsData.title}" data-id="${eventsData._id}">
-      <p>${eventsData.title}</p>
+      <p id="beforeEmoji">${eventsData.title}</p>
       <p>${Date(eventsData.date).toLocaleString('en-US', {
         timeZoneName: "short",
         hour: "2-digit",
@@ -116,7 +116,7 @@ function generateExpenseItemDetails(expense, eventSelectedID) {
   let percentVal = expense.percentage;
   return `
     <li class="subCatItem">
-      <p>${expense.title}</p>
+      <p id="expenseEmoji">${expense.title}</p>
       ${generateSlider(expense,percentVal)}
       <p id="${expense.title}" data-id="${calculateExpenseAmt(percentVal, eventSelectedID)}">\$${calculateExpenseAmt(percentVal, eventSelectedID)}</p>
     </li>`;
@@ -227,7 +227,7 @@ function renderNewExpenseCreated(expenseCreatedDetails,eventSelectedID){
   $('.expenseListSection').append(
   `
     <li class="subCatItem">
-      <p>${newExpenses.title}</p>
+      <p id="expenseEmoji">${newExpenses.title}</p>
       ${generateSlider(newExpenses, newExpenses.percentage)}
       <p id="${newExpenses.title}">\$${calculateExpenseAmt(newExpenses.percentage, eventSelectedID)}</p>
     </li>`);
