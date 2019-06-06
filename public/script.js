@@ -19,8 +19,10 @@ function generateEventsHTML() {
     return generateEventItemHTML(event);
   }).join('');
   return `<section class='events'>
+        <div class="centerButton">
         <h3>Events</h3>
         <button class="addEventButton" id="addEventButton" type="button" value="+" role="button">Add Event</button>
+        </div>
         <ul class="eventItemsList">
         ${eventItems}
         </ul>
@@ -95,9 +97,10 @@ function generateExpenseSection(selectedEvent, eventSelectedID){
   renderExpenseItems2(selectedEvent, eventSelectedID)
   return `
   <section class="expenses">
-  <div id="remainingBudger"></div>
+  <div id="centerExpBtn">
     <h3>Expenses</h3>
     <button class="addExpenseButton" id="addExpenseButton" type="button" value="+" role="button">Add Expense</button>
+    </div>
   </section>`
 }
 
@@ -144,9 +147,11 @@ function calculateExpenseAmt(percentVal,eventSelectedID){
 
 function returnExpenseList(eachExpense){
   return $('body').append(`
-    <ul class="expenseListSection">
+    <div id="centerExpenses">
+      <ul class="expenseListSection">
       ${eachExpense}
     </ul>
+    </div>
 `);
 }
 
